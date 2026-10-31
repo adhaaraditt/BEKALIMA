@@ -16,8 +16,6 @@ class LiquidGlassNavItem {
   });
 }
 
-/// Navigation Bar dengan estetika Liquid Glass (frosted glassmorphism)
-/// Dirancang floating dengan blur transparan, animasi smooth, dan haptic tactile feel.
 class LiquidGlassNavigationBar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;

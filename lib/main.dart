@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'screens/main_navigation_screen.dart';
+import 'screens/welcome_screen.dart';
 import 'theme/theme.dart';
 
 void main() {
@@ -15,7 +15,7 @@ class BekalimaApp extends StatelessWidget {
       title: 'BEKALIMA - Katering Online',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      home: const MainNavigationScreen(),
+      home: const WelcomeScreen(),
     );
   }
 }

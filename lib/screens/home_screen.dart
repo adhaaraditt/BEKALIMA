@@ -192,7 +192,9 @@ class _HomeScreenState extends State<HomeScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Kategori Katering', style: theme.textTheme.titleMedium),
+              Expanded(
+                child: Text('Kategori Katering', style: theme.textTheme.titleMedium),
+              ),
               TextButton(
                 onPressed: () {
                   widget.onNavigateTab?.call(1);
@@ -251,7 +253,9 @@ class _HomeScreenState extends State<HomeScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Menu Unggulan & Favorit', style: theme.textTheme.titleMedium),
+              Expanded(
+                child: Text('Menu Unggulan & Favorit', style: theme.textTheme.titleMedium),
+              ),
               TextButton(
                 onPressed: () {
                   widget.onNavigateTab?.call(1);

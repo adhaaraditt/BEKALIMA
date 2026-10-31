@@ -7,7 +7,6 @@ import '../models/order_item.dart';
 import '../models/review_item.dart';
 
 class CateringService extends ChangeNotifier {
-  // Singleton pattern for simple global access across the app
   static final CateringService _instance = CateringService._internal();
   factory CateringService() => _instance;
 
@@ -15,7 +14,6 @@ class CateringService extends ChangeNotifier {
     _initSampleOrders();
   }
 
-  // --- Menu & Kategori ---
   final List<CategoryItem> _categories = SampleData.categories;
   final List<MenuItem> _menus = List.from(SampleData.menuItems);
   String _selectedCategoryId = 'all';
@@ -46,7 +44,6 @@ class CateringService extends ChangeNotifier {
     notifyListeners();
   }
 
-  // --- Keranjang Belanja ---
   final List<CartItem> _cartItems = [];
 
   List<CartItem> get cartItems => List.unmodifiable(_cartItems);
@@ -99,7 +96,6 @@ class CateringService extends ChangeNotifier {
   List<OrderItem> get orders => List.unmodifiable(_orders);
 
   void _initSampleOrders() {
-    // Pesanan contoh riwayat aktif dan selesai agar user bisa langsung melihat alur
     _orders.add(
       OrderItem(
         id: 'BKL-20261025-01',
@@ -202,7 +198,6 @@ class CateringService extends ChangeNotifier {
     }
   }
 
-  // --- Ulasan (Reviews) ---
   final List<ReviewItem> _reviews = List.from(SampleData.initialReviews);
   List<ReviewItem> get reviews => _reviews;
 
@@ -237,7 +232,6 @@ class CateringService extends ChangeNotifier {
     notifyListeners();
   }
 
-  // --- Profil Pengguna ---
   String userName = 'Raditya Pratama';
   String userEmail = 'raditya@bekalima.com';
   String userPhone = '0812-3456-7890';
@@ -255,6 +249,25 @@ class CateringService extends ChangeNotifier {
     userName = name;
     userPhone = phone;
     userEmail = email;
+    notifyListeners();
+  }
+
+  void login({required String usernameOrEmail}) {
+    if (usernameOrEmail.trim().isNotEmpty) {
+      if (usernameOrEmail.contains('@')) {
+        userEmail = usernameOrEmail.trim();
+        userName = usernameOrEmail.split('@').first;
+      } else {
+        userName = usernameOrEmail.trim();
+      }
+      notifyListeners();
+    }
+  }
+
+  void register({required String email, required String username, required String phone}) {
+    if (username.trim().isNotEmpty) userName = username.trim();
+    if (email.trim().isNotEmpty) userEmail = email.trim();
+    if (phone.trim().isNotEmpty) userPhone = phone.trim();
     notifyListeners();
   }
 
