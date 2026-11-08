@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/catering_service.dart';
 import '../theme/theme.dart';
+import '../widgets/clear_cart_dialog.dart';
 import 'checkout_screen.dart';
 
 class CartScreen extends StatefulWidget {
@@ -47,10 +48,19 @@ class _CartScreenState extends State<CartScreen> {
         actions: [
           if (items.isNotEmpty)
             TextButton(
-              onPressed: () {
-                _cateringService.clearCart();
+              key: const ValueKey('cart_clear_button'),
+              onPressed: () async {
+                final confirmed = await ClearCartConfirmationDialog.show(
+                  context,
+                );
+                if (confirmed == true) {
+                  _cateringService.clearCart();
+                }
               },
-              child: const Text('Kosongkan', style: TextStyle(color: AppColors.tomatoBurst)),
+              child: const Text(
+                'Kosongkan',
+                style: TextStyle(color: AppColors.tomatoBurst),
+              ),
             ),
         ],
       ),
@@ -99,168 +109,208 @@ class _CartScreenState extends State<CartScreen> {
                 ),
               ),
             )
-          : ListView(
+          : ListView.builder(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 120),
-              children: [
-                Text(
-                  'Daftar Menu yang Dipesan (${_cateringService.cartItemCount} Porsi)',
-                  style: theme.textTheme.titleMedium,
-                ),
-                const SizedBox(height: 12),
-                ...items.map((cartItem) {
-                  return Card(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                width: 50,
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  color: AppColors.creamTint,
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: AppColors.border),
-                                ),
-                                alignment: Alignment.center,
-                                child: Text(
-                                  cartItem.menu.imageEmoji,
-                                  style: const TextStyle(fontSize: 26),
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      cartItem.menu.name,
-                                      style: theme.textTheme.titleSmall,
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      '${_formatCurrency(cartItem.menu.price)} / porsi',
-                                      style: theme.textTheme.bodySmall,
-                                    ),
-                                    if (cartItem.specialNote != null)
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 4),
-                                        child: Text(
-                                          'Catatan: "${cartItem.specialNote}"',
-                                          style: theme.textTheme.bodySmall?.copyWith(
-                                            fontStyle: FontStyle.italic,
-                                            color: AppColors.textPrimary,
-                                          ),
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.delete_outline, color: AppColors.tomatoBurst, size: 20),
-                                onPressed: () {
-                                  _cateringService.removeFromCart(cartItem.menu.id);
-                                },
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          const Divider(),
-                          const SizedBox(height: 6),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Subtotal: ${_formatCurrency(cartItem.subtotal)}',
-                                style: theme.textTheme.titleSmall?.copyWith(
-                                  color: AppColors.crispCarrot,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: AppColors.creamTint,
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: AppColors.border),
-                                ),
-                                child: Row(
-                                  children: [
-                                    IconButton(
-                                      icon: const Icon(Icons.remove, size: 16),
-                                      onPressed: () {
-                                        _cateringService.updateQuantity(
-                                          cartItem.menu.id,
-                                          cartItem.quantity - 1,
-                                        );
-                                      },
-                                    ),
-                                    Text(
-                                      '${cartItem.quantity}',
-                                      style: theme.textTheme.titleSmall,
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(Icons.add, size: 16),
-                                      onPressed: () {
-                                        _cateringService.updateQuantity(
-                                          cartItem.menu.id,
-                                          cartItem.quantity + 1,
-                                        );
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+              itemCount: items.length + 2,
+              itemBuilder: (context, index) {
+                if (index == 0) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Text(
+                      'Daftar Menu yang Dipesan (${_cateringService.cartItemCount} Porsi)',
+                      style: theme.textTheme.titleMedium,
                     ),
                   );
-                }),
-                const SizedBox(height: 16),
+                }
 
-                // Ringkasan Pembayaran
-                Text('Rincian Pembayaran', style: theme.textTheme.titleMedium),
-                const SizedBox(height: 8),
-                Card(
+                if (index == items.length + 1) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 16),
+
+                      // Ringkasan Pembayaran
+                      Text(
+                        'Rincian Pembayaran',
+                        style: theme.textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 8),
+                      Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Subtotal Menu Katering',
+                                    style: theme.textTheme.bodyMedium,
+                                  ),
+                                  Text(
+                                    _formatCurrency(subtotal),
+                                    style: theme.textTheme.titleSmall,
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Kemasan Higienis & Peralatan',
+                                    style: theme.textTheme.bodyMedium,
+                                  ),
+                                  Text(
+                                    _formatCurrency(packagingFee),
+                                    style: theme.textTheme.titleSmall,
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              const Divider(),
+                              const SizedBox(height: 12),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Total Biaya',
+                                    style: theme.textTheme.titleMedium
+                                        ?.copyWith(fontWeight: FontWeight.w700),
+                                  ),
+                                  Text(
+                                    _formatCurrency(grandTotal),
+                                    style: theme.textTheme.headlineMedium
+                                        ?.copyWith(
+                                          color: AppColors.crispCarrot,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }
+
+                final cartItem = items[index - 1];
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 12),
                   child: Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(12),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Subtotal Menu Katering', style: theme.textTheme.bodyMedium),
-                            Text(_formatCurrency(subtotal), style: theme.textTheme.titleSmall),
+                            Container(
+                              width: 50,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                color: AppColors.creamTint,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: AppColors.border),
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                cartItem.menu.imageEmoji,
+                                style: const TextStyle(fontSize: 26),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    cartItem.menu.name,
+                                    style: theme.textTheme.titleSmall,
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    '${_formatCurrency(cartItem.menu.price)} / porsi',
+                                    style: theme.textTheme.bodySmall,
+                                  ),
+                                  if (cartItem.specialNote != null)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 4),
+                                      child: Text(
+                                        'Catatan: "${cartItem.specialNote}"',
+                                        style: theme.textTheme.bodySmall
+                                            ?.copyWith(
+                                              fontStyle: FontStyle.italic,
+                                              color: AppColors.textPrimary,
+                                            ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.delete_outline,
+                                color: AppColors.tomatoBurst,
+                                size: 20,
+                              ),
+                              onPressed: () {
+                                _cateringService.removeFromCart(
+                                  cartItem.menu.id,
+                                );
+                              },
+                            ),
                           ],
                         ),
                         const SizedBox(height: 8),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('Kemasan Higienis & Peralatan', style: theme.textTheme.bodyMedium),
-                            Text(_formatCurrency(packagingFee), style: theme.textTheme.titleSmall),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
                         const Divider(),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 6),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Total Biaya',
-                              style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-                            ),
-                            Text(
-                              _formatCurrency(grandTotal),
-                              style: theme.textTheme.headlineMedium?.copyWith(
+                              'Subtotal: ${_formatCurrency(cartItem.subtotal)}',
+                              style: theme.textTheme.titleSmall?.copyWith(
                                 color: AppColors.crispCarrot,
                                 fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: AppColors.creamTint,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: AppColors.border),
+                              ),
+                              child: Row(
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.remove, size: 16),
+                                    onPressed: () {
+                                      _cateringService.updateQuantity(
+                                        cartItem.menu.id,
+                                        cartItem.quantity - 1,
+                                      );
+                                    },
+                                  ),
+                                  Text(
+                                    '${cartItem.quantity}',
+                                    style: theme.textTheme.titleSmall,
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.add, size: 16),
+                                    onPressed: () {
+                                      _cateringService.updateQuantity(
+                                        cartItem.menu.id,
+                                        cartItem.quantity + 1,
+                                      );
+                                    },
+                                  ),
+                                ],
                               ),
                             ),
                           ],
@@ -268,8 +318,8 @@ class _CartScreenState extends State<CartScreen> {
                       ],
                     ),
                   ),
-                ),
-              ],
+                );
+              },
             ),
       bottomSheet: items.isEmpty
           ? null
@@ -279,7 +329,11 @@ class _CartScreenState extends State<CartScreen> {
                 color: Colors.white,
                 border: Border(top: BorderSide(color: AppColors.border)),
                 boxShadow: [
-                  BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, -2)),
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 8,
+                    offset: Offset(0, -2),
+                  ),
                 ],
               ),
               child: SafeArea(
@@ -290,7 +344,10 @@ class _CartScreenState extends State<CartScreen> {
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Total Estimasi', style: theme.textTheme.bodySmall),
+                          Text(
+                            'Total Estimasi',
+                            style: theme.textTheme.bodySmall,
+                          ),
                           Text(
                             _formatCurrency(grandTotal),
                             style: theme.textTheme.titleMedium?.copyWith(
@@ -305,7 +362,9 @@ class _CartScreenState extends State<CartScreen> {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => const CheckoutScreen()),
+                          MaterialPageRoute(
+                            builder: (_) => const CheckoutScreen(),
+                          ),
                         );
                       },
                       child: const Text('Lanjut Pemesanan'),

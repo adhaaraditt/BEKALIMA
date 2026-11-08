@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/catering_service.dart';
+import '../theme/app_colors.dart';
+import '../widgets/liquid_glass_app_bar_components.dart';
 import 'login_screen.dart';
 import 'main_navigation_screen.dart';
 
@@ -25,7 +27,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   final CateringService _cateringService = CateringService();
 
@@ -94,41 +97,61 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      IconButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        icon: const Icon(
-                          Icons.arrow_back_rounded,
-                          color: Colors.white,
-                          size: 26,
-                        ),
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pushReplacement(
-                            PageRouteBuilder(
-                              pageBuilder: (context, animation, secondaryAnimation) =>
-                                  const LoginScreen(),
-                              transitionsBuilder:
-                                  (context, animation, secondaryAnimation, child) {
-                                return FadeTransition(opacity: animation, child: child);
-                              },
-                            ),
-                          );
-                        },
-                        style: TextButton.styleFrom(
+                      LiquidGlassCircle(
+                        size: 40,
+                        child: IconButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          icon: const Icon(
+                            Icons.arrow_back_rounded,
+                            color: AppColors.textPrimary,
+                            size: 22,
+                          ),
                           padding: EdgeInsets.zero,
-                          minimumSize: Size.zero,
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          constraints: const BoxConstraints(),
+                          style: IconButton.styleFrom(
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          tooltip: 'Kembali',
                         ),
-                        child: const Text(
-                          'Masuk',
-                          style: TextStyle(
-                            fontFamily: 'Plus Jakarta Sans',
-                            color: Colors.white,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
+                      ),
+                      Semantics(
+                        button: true,
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).pushReplacement(
+                              PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) =>
+                                        const LoginScreen(),
+                                transitionsBuilder:
+                                    (
+                                      context,
+                                      animation,
+                                      secondaryAnimation,
+                                      child,
+                                    ) {
+                                      return FadeTransition(
+                                        opacity: animation,
+                                        child: child,
+                                      );
+                                    },
+                              ),
+                            );
+                          },
+                          child: LiquidGlassCapsule(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 9,
+                            ),
+                            child: const Text(
+                              'Masuk',
+                              style: TextStyle(
+                                fontFamily: 'Plus Jakarta Sans',
+                                color: AppColors.crispCarrot,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -223,7 +246,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       isVisible: _isConfirmPasswordVisible,
                       onToggleVisibility: () {
                         setState(() {
-                          _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
+                          _isConfirmPasswordVisible =
+                              !_isConfirmPasswordVisible;
                         });
                       },
                     ),
@@ -240,7 +264,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           backgroundColor: const Color(0xFFFFB100),
                           foregroundColor: Colors.black,
                           elevation: 3,
-                          shadowColor: const Color(0xFFFFB100).withValues(alpha: 0.35),
+                          shadowColor: const Color(
+                            0xFFFFB100,
+                          ).withValues(alpha: 0.35),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(26),
                           ),
@@ -293,7 +319,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
             fontWeight: FontWeight.w500,
           ),
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 22, vertical: 16),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 22,
+            vertical: 16,
+          ),
         ),
       ),
     );
@@ -328,10 +357,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
             fontWeight: FontWeight.w500,
           ),
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 22, vertical: 16),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 22,
+            vertical: 16,
+          ),
           suffixIcon: IconButton(
             icon: Icon(
-              isVisible ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+              isVisible
+                  ? Icons.visibility_outlined
+                  : Icons.visibility_off_outlined,
               color: const Color(0xFF666666),
               size: 22,
             ),
@@ -342,4 +376,3 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 }
-

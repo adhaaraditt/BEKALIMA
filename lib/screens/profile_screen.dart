@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../services/catering_service.dart';
 import '../theme/theme.dart';
+import '../widgets/liquid_glass_app_bar_components.dart';
+import 'welcome_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -48,7 +50,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             TextField(
               controller: phoneCtrl,
               keyboardType: TextInputType.phone,
-              decoration: const InputDecoration(labelText: 'Nomor Telepon / WA'),
+              decoration: const InputDecoration(
+                labelText: 'Nomor Telepon / WA',
+              ),
             ),
             const SizedBox(height: 12),
             TextField(
@@ -129,134 +133,250 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profil Saya'),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-        children: [
-          // Kartu Informasi Akun
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
+      body: SafeArea(
+        bottom: false,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
               child: Row(
                 children: [
-                  Container(
-                    width: 60,
-                    height: 60,
-                    decoration: const BoxDecoration(
-                      color: AppColors.cream,
-                      shape: BoxShape.circle,
+                  const LiquidGlassCircle(
+                    child: Icon(
+                      Icons.person_rounded,
+                      color: AppColors.crispCarrot,
+                      size: 22,
                     ),
-                    alignment: Alignment.center,
-                    child: const Icon(Icons.person, size: 36, color: AppColors.forestGreen),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 8),
                   Expanded(
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: LiquidGlassCapsule(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 8,
+                        ),
+                        child: Text(
+                          'Profil Saya',
+                          style: theme.textTheme.titleMedium,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const LiquidGlassCartButton(),
+                ],
+              ),
+            ),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+                children: [
+                  // Kartu Informasi Akun
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 60,
+                            height: 60,
+                            decoration: const BoxDecoration(
+                              color: AppColors.cream,
+                              shape: BoxShape.circle,
+                            ),
+                            alignment: Alignment.center,
+                            child: const Icon(
+                              Icons.person,
+                              size: 36,
+                              color: AppColors.forestGreen,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  _cateringService.userName,
+                                  style: theme.textTheme.titleMedium,
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  _cateringService.userPhone,
+                                  style: theme.textTheme.bodyMedium,
+                                ),
+                                Text(
+                                  _cateringService.userEmail,
+                                  style: theme.textTheme.bodySmall,
+                                ),
+                              ],
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(
+                              Icons.edit_outlined,
+                              color: AppColors.crispCarrot,
+                            ),
+                            onPressed: _showEditProfileDialog,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Daftar Alamat Tersimpan (PRF-3)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Alamat Pengantaran Acara',
+                        style: theme.textTheme.titleMedium,
+                      ),
+                      TextButton.icon(
+                        icon: const Icon(Icons.add, size: 16),
+                        label: const Text('Tambah'),
+                        onPressed: _showAddAddressDialog,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  ...List.generate(_cateringService.savedAddresses.length, (
+                    index,
+                  ) {
+                    final isSelected =
+                        index == _cateringService.selectedAddressIndex;
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      child: ListTile(
+                        leading: Icon(
+                          isSelected
+                              ? Icons.check_circle
+                              : Icons.radio_button_unchecked,
+                          color: isSelected
+                              ? AppColors.forestGreen
+                              : AppColors.textDisabled,
+                        ),
+                        title: Text(
+                          _cateringService.savedAddresses[index],
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            fontWeight: isSelected
+                                ? FontWeight.w600
+                                : FontWeight.w400,
+                          ),
+                        ),
+                        trailing: isSelected
+                            ? Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.cream,
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: const Text(
+                                  'Utama',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.forestGreen,
+                                  ),
+                                ),
+                              )
+                            : null,
+                        onTap: () {
+                          _cateringService.selectAddress(index);
+                        },
+                      ),
+                    );
+                  }),
+                  const SizedBox(height: 24),
+
+                  // Kebijakan & Informasi Katering
+                  Text(
+                    'Informasi Layanan BEKALIMA',
+                    style: theme.textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 8),
+                  Card(
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(_cateringService.userName, style: theme.textTheme.titleMedium),
-                        const SizedBox(height: 2),
-                        Text(_cateringService.userPhone, style: theme.textTheme.bodyMedium),
-                        Text(_cateringService.userEmail, style: theme.textTheme.bodySmall),
+                      children: const [
+                        ListTile(
+                          leading: Icon(
+                            Icons.verified,
+                            color: AppColors.forestGreen,
+                          ),
+                          title: Text('100% Halal & Higienis'),
+                          subtitle: Text(
+                            'Dipersiapkan dengan standar dapur bersih profesional.',
+                          ),
+                        ),
+                        Divider(),
+                        ListTile(
+                          leading: Icon(
+                            Icons.schedule,
+                            color: AppColors.crispCarrot,
+                          ),
+                          title: Text('Waktu Pemesanan (Lead Time)'),
+                          subtitle: Text(
+                            'Pemesanan minimal H-1 sebelum jam 17:00 WIB.',
+                          ),
+                        ),
+                        Divider(),
+                        ListTile(
+                          leading: Icon(
+                            Icons.support_agent,
+                            color: AppColors.forestGreen,
+                          ),
+                          title: Text('Bantuan & Customer Service'),
+                          subtitle: Text(
+                            'WhatsApp: +62 812-9988-7766 (08:00 - 20:00 WIB)',
+                          ),
+                        ),
                       ],
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.edit_outlined, color: AppColors.crispCarrot),
-                    onPressed: _showEditProfileDialog,
+                  const SizedBox(height: 24),
+
+                  Card(
+                    child: ListTile(
+                      key: const ValueKey('logout_button'),
+                      leading: const Icon(
+                        Icons.logout_rounded,
+                        color: AppColors.tomatoBurst,
+                      ),
+                      title: const Text('Keluar'),
+                      subtitle: const Text(
+                        'Kembali ke halaman selamat datang.',
+                      ),
+                      onTap: () {
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute<void>(
+                            builder: (_) => const WelcomeScreen(),
+                          ),
+                          (route) => false,
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  Center(
+                    child: Text(
+                      'BEKALIMA v0.1 (Draft MVP)',
+                      style: theme.textTheme.bodySmall,
+                    ),
                   ),
                 ],
               ),
             ),
-          ),
-          const SizedBox(height: 24),
-
-          // Daftar Alamat Tersimpan (PRF-3)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('Alamat Pengantaran Acara', style: theme.textTheme.titleMedium),
-              TextButton.icon(
-                icon: const Icon(Icons.add, size: 16),
-                label: const Text('Tambah'),
-                onPressed: _showAddAddressDialog,
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          ...List.generate(_cateringService.savedAddresses.length, (index) {
-            final isSelected = index == _cateringService.selectedAddressIndex;
-            return Card(
-              margin: const EdgeInsets.only(bottom: 8),
-              child: ListTile(
-                leading: Icon(
-                  isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
-                  color: isSelected ? AppColors.forestGreen : AppColors.textDisabled,
-                ),
-                title: Text(
-                  _cateringService.savedAddresses[index],
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                  ),
-                ),
-                trailing: isSelected
-                    ? Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: AppColors.cream,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: const Text(
-                          'Utama',
-                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.forestGreen),
-                        ),
-                      )
-                    : null,
-                onTap: () {
-                  _cateringService.selectAddress(index);
-                },
-              ),
-            );
-          }),
-          const SizedBox(height: 24),
-
-          // Kebijakan & Informasi Katering
-          Text('Informasi Layanan BEKALIMA', style: theme.textTheme.titleMedium),
-          const SizedBox(height: 8),
-          Card(
-            child: Column(
-              children: const [
-                ListTile(
-                  leading: Icon(Icons.verified, color: AppColors.forestGreen),
-                  title: Text('100% Halal & Higienis'),
-                  subtitle: Text('Dipersiapkan dengan standar dapur bersih profesional.'),
-                ),
-                Divider(),
-                ListTile(
-                  leading: Icon(Icons.schedule, color: AppColors.crispCarrot),
-                  title: Text('Waktu Pemesanan (Lead Time)'),
-                  subtitle: Text('Pemesanan minimal H-1 sebelum jam 17:00 WIB.'),
-                ),
-                Divider(),
-                ListTile(
-                  leading: Icon(Icons.support_agent, color: AppColors.forestGreen),
-                  title: Text('Bantuan & Customer Service'),
-                  subtitle: Text('WhatsApp: +62 812-9988-7766 (08:00 - 20:00 WIB)'),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 24),
-
-          Center(
-            child: Text(
-              'BEKALIMA v0.1 (Draft MVP)',
-              style: theme.textTheme.bodySmall,
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

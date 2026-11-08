@@ -8,7 +8,8 @@ plugins {
 android {
     namespace = "com.example.bekalima"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    // ndkVersion sengaja tidak diset: project ini tidak punya native code,
+    // dan NDK 28.2 di mesin build terpasang tidak lengkap.
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17

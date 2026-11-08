@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:bekalima/main.dart';
+import 'package:bekalima/widgets/add_to_cart_dialog.dart';
 
 void main() {
   testWidgets('Welcome, Login, and Register screen flow',
@@ -62,5 +63,87 @@ void main() {
     // Verifikasi masuk ke layar utama katering
     expect(find.text('Katering Online Indonesia'), findsOneWidget);
     expect(find.text('Kategori Katering'), findsOneWidget);
+
+    // 5. Verifikasi Bottom Navigation Bar: hanya tab aktif yang menampilkan label
+    expect(find.text('Beranda'), findsOneWidget);
+
+    // Verifikasi sliding indicator awal berada di tab pertama (-1.0)
+    final initialIndicator = tester.widget<AnimatedAlign>(
+      find.byType(AnimatedAlign),
+    );
+    expect(initialIndicator.alignment, equals(const Alignment(-1.0, 0.0)));
+
+    // Tab lain yang belum aktif hanya menampilkan ikonnya
+    final menuCrossFade = tester.widget<AnimatedCrossFade>(
+      find.byWidgetPredicate((widget) =>
+          widget is AnimatedCrossFade &&
+          widget.firstChild is Padding &&
+          ((widget.firstChild as Padding).child is AnimatedDefaultTextStyle) &&
+          (((widget.firstChild as Padding).child as AnimatedDefaultTextStyle).child as Text).data == 'Menu'),
+    );
+    expect(menuCrossFade.crossFadeState, equals(CrossFadeState.showSecond));
+
+    // Ketuk tab Menu
+    await tester.tap(find.byIcon(Icons.restaurant_menu_outlined));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    // Sekarang tab Menu menampilkan labelnya dan sliding indicator bergeser ke tab Menu
+    final updatedIndicator = tester.widget<AnimatedAlign>(
+      find.byType(AnimatedAlign),
+    );
+    expect((updatedIndicator.alignment as Alignment).x, closeTo(-0.33, 0.05));
+
+    final updatedMenuCrossFade = tester.widget<AnimatedCrossFade>(
+      find.byWidgetPredicate((widget) =>
+          widget is AnimatedCrossFade &&
+          widget.firstChild is Padding &&
+          ((widget.firstChild as Padding).child is AnimatedDefaultTextStyle) &&
+          (((widget.firstChild as Padding).child as AnimatedDefaultTextStyle).child as Text).data == 'Menu'),
+    );
+    expect(updatedMenuCrossFade.crossFadeState, equals(CrossFadeState.showFirst));
+  });
+
+  testWidgets('AddToCartSuccessDialog displays message and closes on X tap',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Builder(
+          builder: (context) => Scaffold(
+            body: Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  AddToCartSuccessDialog.show(
+                    context,
+                    menuName: 'Nasi Liwet Komplit',
+                    quantity: 5,
+                  );
+                },
+                child: const Text('Add'),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    // Buka dialog
+    await tester.tap(find.text('Add'));
+    await tester.pumpAndSettle();
+
+    // Verifikasi konten dialog di tengah layar
+    expect(find.text('Berhasil Ditambahkan'), findsOneWidget);
+    expect(
+      find.text('Berhasil menambahkan 5 porsi Nasi Liwet Komplit ke keranjang.'),
+      findsOneWidget,
+    );
+    expect(find.byKey(const ValueKey('dialog_close_button')), findsOneWidget);
+    expect(find.byKey(const ValueKey('dialog_view_cart_button')), findsOneWidget);
+
+    // Ketuk tombol X untuk menutup
+    await tester.tap(find.byKey(const ValueKey('dialog_close_button')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Berhasil Ditambahkan'), findsNothing);
   });
 }

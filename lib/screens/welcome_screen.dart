@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'login_screen.dart';
 import 'register_screen.dart';
 
-
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
 
@@ -12,17 +11,14 @@ class WelcomeScreen extends StatefulWidget {
 
 class _WelcomeScreenState extends State<WelcomeScreen>
     with TickerProviderStateMixin {
- 
   late final AnimationController _arrowBounceController;
   late final Animation<double> _arrowBounceAnimation;
   late final Animation<double> _pulseRingAnimation;
 
-  
   late final AnimationController _logoFloatController;
   late final Animation<double> _logoFloatAnimation;
   late final Animation<double> _logoScaleAnimation;
 
- 
   bool _isSheetOpen = false;
 
   @override
@@ -48,7 +44,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       ),
     );
 
-  
     _logoFloatController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 2400),
@@ -96,10 +91,16 @@ class _WelcomeScreenState extends State<WelcomeScreen>
             const LoginScreen(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return SlideTransition(
-            position: Tween<Offset>(
-              begin: const Offset(1.0, 0.0),
-              end: Offset.zero,
-            ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic)),
+            position:
+                Tween<Offset>(
+                  begin: const Offset(1.0, 0.0),
+                  end: Offset.zero,
+                ).animate(
+                  CurvedAnimation(
+                    parent: animation,
+                    curve: Curves.easeOutCubic,
+                  ),
+                ),
             child: child,
           );
         },
@@ -115,10 +116,16 @@ class _WelcomeScreenState extends State<WelcomeScreen>
             const RegisterScreen(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return SlideTransition(
-            position: Tween<Offset>(
-              begin: const Offset(1.0, 0.0),
-              end: Offset.zero,
-            ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic)),
+            position:
+                Tween<Offset>(
+                  begin: const Offset(1.0, 0.0),
+                  end: Offset.zero,
+                ).animate(
+                  CurvedAnimation(
+                    parent: animation,
+                    curve: Curves.easeOutCubic,
+                  ),
+                ),
             child: child,
           );
         },
@@ -129,17 +136,20 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   @override
   Widget build(BuildContext context) {
     const brandOrange = Color(0xFFFA5805); // Warna oranye cerah khas BEKALIMA
-    final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
+    final logoCacheSize = (163 * MediaQuery.devicePixelRatioOf(context))
+        .round();
 
     return Scaffold(
       backgroundColor: brandOrange,
       body: GestureDetector(
         onVerticalDragEnd: (details) {
           // Swipe ke atas untuk membuka sheet
-          if (details.primaryVelocity != null && details.primaryVelocity! < -200) {
+          if (details.primaryVelocity != null &&
+              details.primaryVelocity! < -200) {
             _openWelcomeSheet();
-          } else if (details.primaryVelocity != null && details.primaryVelocity! > 200) {
+          } else if (details.primaryVelocity != null &&
+              details.primaryVelocity! > 200) {
             _closeWelcomeSheet();
           }
         },
@@ -150,98 +160,117 @@ class _WelcomeScreenState extends State<WelcomeScreen>
               child: SizedBox(
                 width: double.infinity,
                 height: double.infinity,
-                child: Column(
-                  children: [
-                    // Memberikan proporsi posisi logo yang pas di tengah atas
-                    SizedBox(height: _isSheetOpen ? screenHeight * 0.04 : screenHeight * 0.12),
-
-                    // Logo Bento dengan animasi floating & breathing halus
-                    AnimatedBuilder(
-                      animation: _logoFloatController,
-                      builder: (context, child) {
-                        return Transform.translate(
-                          offset: Offset(0, _logoFloatAnimation.value),
-                          child: Transform.scale(
-                            scale: _logoScaleAnimation.value,
-                            child: child,
-                          ),
-                        );
-                      },
-                      child: Container(
-                        width: 195,
-                        height: 195,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF9EED9), // Warna cream beige lingkaran
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.08),
-                              blurRadius: 24,
-                              offset: const Offset(0, 10),
+                child: Center(
+                  child: AnimatedPadding(
+                    duration: const Duration(milliseconds: 380),
+                    curve: Curves.easeOutCubic,
+                    padding: EdgeInsets.only(bottom: _isSheetOpen ? 340 : 0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Logo Bento dengan animasi floating & breathing halus
+                        RepaintBoundary(
+                          child: AnimatedBuilder(
+                            animation: _logoFloatController,
+                            builder: (context, child) {
+                              return Transform.translate(
+                                offset: Offset(0, _logoFloatAnimation.value),
+                                child: Transform.scale(
+                                  scale: _logoScaleAnimation.value,
+                                  child: child,
+                                ),
+                              );
+                            },
+                            child: Container(
+                              width: 160,
+                              height: 160,
+                              decoration: BoxDecoration(
+                                color: const Color(
+                                  0xFFF9EED9,
+                                ), // Warna cream beige lingkaran
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.08),
+                                    blurRadius: 24,
+                                    offset: const Offset(0, 10),
+                                  ),
+                                ],
+                              ),
+                              alignment: Alignment.center,
+                              child: ClipOval(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Image.asset(
+                                    'assets/images/logo.png',
+                                    fit: BoxFit.contain,
+                                    cacheWidth: logoCacheSize,
+                                    cacheHeight: logoCacheSize,
+                                    gaplessPlayback: true,
+                                    errorBuilder:
+                                        (context, error, stackTrace) =>
+                                            const Text(
+                                              '🍱',
+                                              style: TextStyle(fontSize: 84),
+                                            ),
+                                  ),
+                                ),
+                              ),
                             ),
-                          ],
-                        ),
-                        alignment: Alignment.center,
-                        child: ClipOval(
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Image.asset(
-                              'assets/images/logo.png',
-                              fit: BoxFit.contain,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  const Text('🍱', style: TextStyle(fontSize: 84)),
-                            ),
                           ),
                         ),
-                      ),
-                    ),
 
-                    const SizedBox(height: 22),
+                        const SizedBox(height: 22),
 
-                    // Judul BEKALIMA
-                    const Text(
-                      'BEKALIMA',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontFamily: 'Plus Jakarta Sans',
-                        fontSize: 32,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.white,
-                        letterSpacing: 1.2,
-                        height: 1.1,
-                      ),
-                    ),
-
-                    const SizedBox(height: 6),
-
-                    // Subtitle Healty Food Catering
-                    Text(
-                      'Healty Food Catering',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontFamily: 'Plus Jakarta Sans',
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white.withValues(alpha: 0.92),
-                        letterSpacing: 0.3,
-                      ),
-                    ),
-
-                    const Spacer(),
-
-                    
-                    AnimatedOpacity(
-                      opacity: _isSheetOpen ? 0.0 : 1.0,
-                      duration: const Duration(milliseconds: 250),
-                      child: IgnorePointer(
-                        ignoring: _isSheetOpen,
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 44.0),
-                          child: _buildAnimatedArrowButton(),
+                        // Judul BEKALIMA
+                        const Text(
+                          'BEKALIMA',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontFamily: 'Plus Jakarta Sans',
+                            fontSize: 32,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.white,
+                            letterSpacing: 1.2,
+                            height: 1.1,
+                          ),
                         ),
-                      ),
+
+                        const SizedBox(height: 6),
+
+                        // Subtitle Healty Food Catering
+                        Text(
+                          'Healty Food Catering',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontFamily: 'Plus Jakarta Sans',
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white.withValues(alpha: 0.92),
+                            letterSpacing: 0.3,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
+                ),
+              ),
+            ),
+
+            // Tombol panah di bagian bawah layar
+            SafeArea(
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: AnimatedOpacity(
+                  opacity: _isSheetOpen ? 0.0 : 1.0,
+                  duration: const Duration(milliseconds: 250),
+                  child: IgnorePointer(
+                    ignoring: _isSheetOpen,
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 44.0),
+                      child: _buildAnimatedArrowButton(),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -251,9 +280,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                 child: GestureDetector(
                   onTap: _closeWelcomeSheet,
                   behavior: HitTestBehavior.opaque,
-                  child: Container(
-                    color: Colors.black.withValues(alpha: 0.01),
-                  ),
+                  child: Container(color: Colors.black.withValues(alpha: 0.01)),
                 ),
               ),
 
@@ -275,7 +302,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     return AnimatedBuilder(
       animation: _arrowBounceController,
       builder: (context, child) {
-        final ringOpacity = (1.0 - (_pulseRingAnimation.value - 1.0) / 0.35).clamp(0.0, 0.45);
+        final ringOpacity = (1.0 - (_pulseRingAnimation.value - 1.0) / 0.35)
+            .clamp(0.0, 0.45);
         return Transform.translate(
           offset: Offset(0, _arrowBounceAnimation.value),
           child: Stack(
@@ -290,7 +318,9 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                     height: 58,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: const Color(0xFFFFB100).withValues(alpha: ringOpacity),
+                      color: const Color(
+                        0xFFFFB100,
+                      ).withValues(alpha: ringOpacity),
                     ),
                   ),
                 ),
@@ -298,7 +328,9 @@ class _WelcomeScreenState extends State<WelcomeScreen>
               GestureDetector(
                 onTap: _openWelcomeSheet,
                 child: Material(
-                  color: const Color(0xFFFFB100), // Warna kuning emas terang sesuai gambar
+                  color: const Color(
+                    0xFFFFB100,
+                  ), // Warna kuning emas terang sesuai gambar
                   shape: const CircleBorder(),
                   elevation: 4,
                   shadowColor: Colors.black.withValues(alpha: 0.25),
@@ -321,15 +353,14 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       },
     );
   }
+
   Widget _buildWelcomeCard(double screenWidth) {
     return Container(
       width: screenWidth,
       padding: const EdgeInsets.fromLTRB(28, 16, 28, 32),
       decoration: const BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(34),
-        ),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(34)),
         boxShadow: [
           BoxShadow(
             color: Color(0x2B000000),
@@ -392,7 +423,9 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                       backgroundColor: const Color(0xFFFFAC00),
                       foregroundColor: const Color(0xFF111111),
                       elevation: 3,
-                      shadowColor: const Color(0xFFFFAC00).withValues(alpha: 0.4),
+                      shadowColor: const Color(
+                        0xFFFFAC00,
+                      ).withValues(alpha: 0.4),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(26),
                       ),

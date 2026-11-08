@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/menu_item.dart';
 import '../services/catering_service.dart';
 import '../theme/theme.dart';
+import '../widgets/add_to_cart_dialog.dart';
 
 class MenuDetailScreen extends StatefulWidget {
   final MenuItem menu;
@@ -54,19 +55,11 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
       note: _noteController.text.trim().isNotEmpty ? _noteController.text.trim() : null,
     );
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        backgroundColor: AppColors.forestGreen,
-        content: Text('Berhasil menambahkan $_quantity porsi ke keranjang.'),
-        action: SnackBarAction(
-          label: 'Lihat',
-          textColor: Colors.white,
-          onPressed: () => Navigator.pop(context, true),
-        ),
-      ),
+    AddToCartSuccessDialog.show(
+      context,
+      menuName: widget.menu.name,
+      quantity: _quantity,
     );
-
-    Navigator.pop(context);
   }
 
   @override

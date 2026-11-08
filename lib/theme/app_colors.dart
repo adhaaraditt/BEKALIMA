@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-
 abstract final class AppColors {
   static const Color crispCarrot = Color(0xFFF86015);
   static const Color forestGreen = Color(0xFF19532B);
@@ -15,4 +14,9 @@ abstract final class AppColors {
   static const Color cardSurface = Color(0xFFFFFFFF);
   static const Color border = Color(0xFFE7DEC8);
   static const Color inputFill = Color(0xFFF3EEDF);
+
+  // Palet teal untuk hero & dashboard beranda.
+  static const Color deepTeal = Color(0xFF02323D);
+  static const Color teal = Color(0xFF0B5B67);
+  static const Color tealBright = Color(0xFF2FBCB3);
 }

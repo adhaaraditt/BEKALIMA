@@ -122,6 +122,16 @@ abstract final class AppTheme {
         thickness: 1,
         space: 1,
       ),
+      snackBarTheme: const SnackBarThemeData(
+        backgroundColor: AppColors.forestGreen,
+        showCloseIcon: true,
+        closeIconColor: Colors.white,
+        contentTextStyle: TextStyle(
+          color: Colors.white,
+          fontSize: 14,
+          fontFamily: 'Plus Jakarta Sans',
+        ),
+      ),
     );
   }
 }

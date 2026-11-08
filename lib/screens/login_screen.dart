@@ -1,5 +1,8 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../services/catering_service.dart';
+import '../theme/app_colors.dart';
+import '../widgets/liquid_glass_app_bar_components.dart';
 import 'main_navigation_screen.dart';
 import 'register_screen.dart';
 
@@ -143,7 +146,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       fontSize: 14,
                     ),
                     border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 14,
+                    ),
                   ),
                 ),
               ),
@@ -156,7 +162,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('Tautan reset password telah dikirim ke email Anda.'),
+                        content: Text(
+                          'Tautan reset password telah dikirim ke email Anda.',
+                        ),
                         backgroundColor: Color(0xFF19532B),
                       ),
                     );
@@ -206,41 +214,61 @@ class _LoginScreenState extends State<LoginScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      IconButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        icon: const Icon(
-                          Icons.arrow_back_rounded,
-                          color: Colors.white,
-                          size: 26,
-                        ),
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pushReplacement(
-                            PageRouteBuilder(
-                              pageBuilder: (context, animation, secondaryAnimation) =>
-                                  const RegisterScreen(),
-                              transitionsBuilder:
-                                  (context, animation, secondaryAnimation, child) {
-                                return FadeTransition(opacity: animation, child: child);
-                              },
-                            ),
-                          );
-                        },
-                        style: TextButton.styleFrom(
+                      LiquidGlassCircle(
+                        size: 40,
+                        child: IconButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          icon: const Icon(
+                            Icons.arrow_back_rounded,
+                            color: AppColors.textPrimary,
+                            size: 22,
+                          ),
                           padding: EdgeInsets.zero,
-                          minimumSize: Size.zero,
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          constraints: const BoxConstraints(),
+                          style: IconButton.styleFrom(
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          tooltip: 'Kembali',
                         ),
-                        child: const Text(
-                          'Daftar',
-                          style: TextStyle(
-                            fontFamily: 'Plus Jakarta Sans',
-                            color: Colors.white,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
+                      ),
+                      Semantics(
+                        button: true,
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).pushReplacement(
+                              PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) =>
+                                        const RegisterScreen(),
+                                transitionsBuilder:
+                                    (
+                                      context,
+                                      animation,
+                                      secondaryAnimation,
+                                      child,
+                                    ) {
+                                      return FadeTransition(
+                                        opacity: animation,
+                                        child: child,
+                                      );
+                                    },
+                              ),
+                            );
+                          },
+                          child: LiquidGlassCapsule(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 9,
+                            ),
+                            child: const Text(
+                              'Daftar',
+                              style: TextStyle(
+                                fontFamily: 'Plus Jakarta Sans',
+                                color: AppColors.crispCarrot,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -315,8 +343,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             fontWeight: FontWeight.w500,
                           ),
                           border: InputBorder.none,
-                          contentPadding:
-                              EdgeInsets.symmetric(horizontal: 22, vertical: 16),
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 22,
+                            vertical: 16,
+                          ),
                         ),
                       ),
                     ),
@@ -347,7 +377,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           border: InputBorder.none,
                           contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 22, vertical: 16),
+                            horizontal: 22,
+                            vertical: 16,
+                          ),
                           suffixIcon: IconButton(
                             icon: Icon(
                               _isPasswordVisible
@@ -402,7 +434,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           backgroundColor: const Color(0xFFFFB100),
                           foregroundColor: Colors.black,
                           elevation: 3,
-                          shadowColor: const Color(0xFFFFB100).withValues(alpha: 0.35),
+                          shadowColor: const Color(
+                            0xFFFFB100,
+                          ).withValues(alpha: 0.35),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(26),
                           ),
@@ -471,22 +505,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Row(
                           children: [
                             Container(
-                              width: 24,
-                              height: 24,
+                              width: 28,
+                              height: 28,
                               decoration: const BoxDecoration(
                                 shape: BoxShape.circle,
                                 color: Colors.white,
                               ),
                               alignment: Alignment.center,
-                              child: const Text(
-                                'G',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w900,
-                                  fontFamily: 'Plus Jakarta Sans',
-                                ),
-                              ),
+                              child: const _GoogleLogo(size: 18),
                             ),
                             const SizedBox(width: 14),
                             const Expanded(
@@ -531,21 +557,17 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Row(
                           children: [
                             Container(
-                              width: 24,
-                              height: 24,
+                              width: 28,
+                              height: 28,
                               decoration: const BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: Color(0xFF1877F2),
+                                color: Colors.white,
                               ),
                               alignment: Alignment.center,
-                              child: const Text(
-                                'f',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w900,
-                                  fontFamily: 'Plus Jakarta Sans',
-                                ),
+                              child: const Icon(
+                                Icons.facebook,
+                                color: Color(0xFF1877F2),
+                                size: 25,
                               ),
                             ),
                             const SizedBox(width: 14),
@@ -580,3 +602,63 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
+/// Logo Google empat warna, digambar langsung agar tetap tajam tanpa aset tambahan.
+class _GoogleLogo extends StatelessWidget {
+  final double size;
+
+  const _GoogleLogo({this.size = 18});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: size,
+      height: size,
+      child: CustomPaint(painter: _GoogleLogoPainter()),
+    );
+  }
+}
+
+class _GoogleLogoPainter extends CustomPainter {
+  static const _blue = Color(0xFF4285F4);
+  static const _red = Color(0xFFEA4335);
+  static const _yellow = Color(0xFFFBBC05);
+  static const _green = Color(0xFF34A853);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final strokeWidth = size.width * 0.2;
+    final rect = (Offset.zero & size).deflate(strokeWidth / 2);
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth;
+
+    void arc(Color color, double startDegrees, double sweepDegrees) {
+      canvas.drawArc(
+        rect,
+        startDegrees * math.pi / 180,
+        sweepDegrees * math.pi / 180,
+        false,
+        paint..color = color,
+      );
+    }
+
+    arc(_green, 10, 85);
+    arc(_yellow, 95, 90);
+    arc(_red, 185, 90);
+    arc(_blue, 275, 77);
+
+    // Batang horizontal biru yang jadi ciri khas huruf G Google.
+    canvas.drawRect(
+      Rect.fromLTRB(
+        size.width * 0.52,
+        size.height * 0.5 - strokeWidth / 2,
+        size.width - strokeWidth / 2,
+        size.height * 0.5 + strokeWidth / 2,
+      ),
+      Paint()..color = _blue,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
