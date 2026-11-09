@@ -97,7 +97,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const LiquidGlassCartButton(),
+                  const LiquidGlassThemeToggleButton(),
+                  const SizedBox(width: 8),
+                  const LiquidGlassNotificationButton(),
                 ],
               ),
             ),
@@ -142,9 +144,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           vertical: 10,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.cream,
+                          color: theme.colorScheme.surfaceContainerHigh,
                           borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: AppColors.border),
+                          border: Border.all(
+                            color: theme.colorScheme.outlineVariant,
+                          ),
                         ),
                         child: Row(
                           children: [
@@ -158,19 +162,19 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
+                                  Text(
                                     'Kirim Katering ke:',
                                     style: TextStyle(
                                       fontSize: 11,
-                                      color: AppColors.textSecondary,
+                                      color: theme.colorScheme.onSurfaceVariant,
                                     ),
                                   ),
                                   Text(
                                     _cateringService.currentAddress,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w600,
-                                      color: AppColors.textPrimary,
+                                      color: theme.colorScheme.onSurface,
                                     ),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
@@ -178,10 +182,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ],
                               ),
                             ),
-                            const Icon(
+                            Icon(
                               Icons.keyboard_arrow_down,
                               size: 20,
-                              color: AppColors.textSecondary,
+                              color: theme.colorScheme.onSurfaceVariant,
                             ),
                           ],
                         ),
@@ -359,6 +363,8 @@ class _HomeScreenState extends State<HomeScreen> {
     required String emoji,
     required VoidCallback onTap,
   }) {
+    final theme = Theme.of(context);
+
     return Expanded(
       child: InkWell(
         onTap: onTap,
@@ -366,9 +372,9 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: theme.colorScheme.surface,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: theme.colorScheme.outlineVariant),
           ),
           child: Column(
             children: [
@@ -376,10 +382,10 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 6),
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                  color: theme.colorScheme.onSurface,
                 ),
                 textAlign: TextAlign.center,
                 maxLines: 1,

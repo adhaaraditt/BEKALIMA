@@ -71,10 +71,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
         title: Row(
-          children: const [
-            Icon(Icons.check_circle, color: AppColors.forestGreen, size: 28),
-            SizedBox(width: 8),
-            Text('Pesanan Berhasil!'),
+          children: [
+            Icon(
+              Icons.check_circle,
+              color: Theme.of(context).colorScheme.secondary,
+              size: 28,
+            ),
+            const SizedBox(width: 8),
+            const Text('Pesanan Berhasil!'),
           ],
         ),
         content: Column(
@@ -93,7 +97,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppColors.cream,
+                color: Theme.of(context).colorScheme.surfaceContainerHigh,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Column(
@@ -140,18 +144,25 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppColors.cream,
+                color: theme.colorScheme.surfaceContainerHigh,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: AppColors.border),
+                border: Border.all(color: theme.colorScheme.outlineVariant),
               ),
               child: Row(
-                children: const [
-                  Icon(Icons.info_outline, color: AppColors.forestGreen, size: 22),
-                  SizedBox(width: 10),
+                children: [
+                  Icon(
+                    Icons.info_outline,
+                    color: theme.colorScheme.secondary,
+                    size: 22,
+                  ),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       'Pemesanan katering disarankan H-1 sebelum jam 17:00 WIB agar bahan segar dapat disiapkan maksimal.',
-                      style: TextStyle(fontSize: 12, color: AppColors.textPrimary),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: theme.colorScheme.onSurface,
+                      ),
                     ),
                   ),
                 ],
@@ -236,7 +247,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   return ListTile(
                     leading: Icon(
                       isSelected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
-                      color: isSelected ? AppColors.crispCarrot : AppColors.textDisabled,
+                      color: isSelected
+                          ? AppColors.crispCarrot
+                          : theme.colorScheme.onSurfaceVariant,
                     ),
                     title: Text(
                       method,
@@ -256,10 +269,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       ),
       bottomSheet: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: AppColors.border)),
-          boxShadow: [
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surface,
+          border: Border(
+            top: BorderSide(color: theme.colorScheme.outlineVariant),
+          ),
+          boxShadow: const [
             BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, -2)),
           ],
         ),

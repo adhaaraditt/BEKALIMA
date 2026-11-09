@@ -28,7 +28,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       case OrderStatus.shipped:
         return AppColors.kiwi;
       case OrderStatus.completed:
-        return AppColors.forestGreen;
+        return Theme.of(context).colorScheme.secondary;
       case OrderStatus.cancelled:
         return AppColors.textDisabled;
     }
@@ -268,7 +268,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.person_outline, size: 20, color: AppColors.textSecondary),
+                      Icon(Icons.person_outline, size: 20, color: theme.colorScheme.onSurfaceVariant),
                       const SizedBox(width: 8),
                       Text(widget.order.recipientName, style: theme.textTheme.titleSmall),
                     ],
@@ -276,7 +276,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   const SizedBox(height: 6),
                   Row(
                     children: [
-                      const Icon(Icons.phone_outlined, size: 20, color: AppColors.textSecondary),
+                      Icon(Icons.phone_outlined, size: 20, color: theme.colorScheme.onSurfaceVariant),
                       const SizedBox(width: 8),
                       Text(widget.order.recipientPhone, style: theme.textTheme.bodyMedium),
                     ],
@@ -285,7 +285,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(Icons.location_on_outlined, size: 20, color: AppColors.textSecondary),
+                      Icon(Icons.location_on_outlined, size: 20, color: theme.colorScheme.onSurfaceVariant),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(widget.order.deliveryAddress, style: theme.textTheme.bodyMedium),

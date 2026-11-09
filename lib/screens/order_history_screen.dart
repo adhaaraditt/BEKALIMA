@@ -48,7 +48,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen>
       case OrderStatus.shipped:
         return AppColors.kiwi;
       case OrderStatus.completed:
-        return AppColors.forestGreen;
+        return Theme.of(context).colorScheme.secondary;
       case OrderStatus.cancelled:
         return AppColors.textDisabled;
     }
@@ -118,14 +118,16 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen>
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const LiquidGlassCartButton(),
+                  const LiquidGlassThemeToggleButton(),
+                  const SizedBox(width: 8),
+                  const LiquidGlassNotificationButton(),
                 ],
               ),
             ),
             TabBar(
               controller: _tabController,
               labelColor: AppColors.crispCarrot,
-              unselectedLabelColor: AppColors.textSecondary,
+              unselectedLabelColor: theme.colorScheme.onSurfaceVariant,
               indicatorColor: AppColors.crispCarrot,
               tabs: const [
                 Tab(text: 'Semua'),
@@ -146,10 +148,10 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen>
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.receipt_long_outlined,
                               size: 54,
-                              color: AppColors.textDisabled,
+                              color: theme.colorScheme.onSurfaceVariant,
                             ),
                             const SizedBox(height: 12),
                             Text(
@@ -305,7 +307,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen>
                                       'Lihat Detail & Lacak Status >',
                                       style: theme.textTheme.labelSmall
                                           ?.copyWith(
-                                            color: AppColors.forestGreen,
+                                            color: theme.colorScheme.secondary,
                                             fontWeight: FontWeight.w700,
                                           ),
                                     ),

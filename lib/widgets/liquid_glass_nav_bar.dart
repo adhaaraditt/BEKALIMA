@@ -1,7 +1,10 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import '../screens/cart_screen.dart';
+import '../services/catering_service.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_typography.dart';
+import '../theme/glass_palette.dart';
 
 /// Item data model untuk [LiquidGlassNavigationBar]
 class LiquidGlassNavItem {
@@ -23,6 +26,10 @@ class LiquidGlassNavigationBar extends StatelessWidget {
   final List<LiquidGlassNavItem> items;
   final bool onlyShowSelectedLabel;
 
+  /// Aksi utama yang ditampilkan di tengah bar, di antara item navigasi.
+  /// Tidak ikut terpilih sebagai tab.
+  final Widget? centerAction;
+
   const LiquidGlassNavigationBar({
     super.key,
     required this.currentIndex,
@@ -30,11 +37,22 @@ class LiquidGlassNavigationBar extends StatelessWidget {
     this.isFloating = true,
     required this.items,
     this.onlyShowSelectedLabel = true,
+    this.centerAction,
   });
 
   @override
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).padding.bottom;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final scheme = Theme.of(context).colorScheme;
+    final palette = glassPaletteOf(context);
+
+    // Saat ada aksi tengah, bar punya satu slot ekstra di tengah.
+    final centerSlot = items.length ~/ 2;
+    final slotCount = items.length + (centerAction != null ? 1 : 0);
+    final activeSlot = centerAction != null && currentIndex >= centerSlot
+        ? currentIndex + 1
+        : currentIndex;
 
     final content = Container(
       height: 64,
@@ -43,25 +61,22 @@ class LiquidGlassNavigationBar extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Colors.white.withValues(alpha: 0.58),
-            Colors.white.withValues(alpha: 0.22),
-          ],
+          colors: [palette.navGradientStart, palette.navGradientEnd],
         ),
         borderRadius: BorderRadius.circular(isFloating ? 28 : 0),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.85),
+          color: palette.border,
           width: 1.2,
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.textPrimary.withValues(alpha: 0.07),
+            color: palette.shadow,
             blurRadius: 18,
             spreadRadius: -2,
             offset: const Offset(0, 8),
           ),
           BoxShadow(
-            color: Colors.white.withValues(alpha: 0.5),
+            color: palette.highlight,
             blurRadius: 4,
             offset: const Offset(0, -1),
           ),
@@ -70,21 +85,21 @@ class LiquidGlassNavigationBar extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          if (items.isNotEmpty)
+          if (items.isNotEmpty && slotCount > 0)
             AnimatedAlign(
               duration: const Duration(milliseconds: 280),
               curve: Curves.easeOutCubic,
               alignment: Alignment(
-                items.length > 1
+                slotCount > 1
                     ? -1.0 +
-                        (currentIndex.clamp(0, items.length - 1) /
-                                (items.length - 1)) *
+                        (activeSlot.clamp(0, slotCount - 1) /
+                                (slotCount - 1)) *
                             2.0
                     : 0.0,
                 0.0,
               ),
               child: FractionallySizedBox(
-                widthFactor: 1.0 / items.length,
+                widthFactor: 1.0 / slotCount,
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 3),
                   height: 46,
@@ -108,81 +123,15 @@ class LiquidGlassNavigationBar extends StatelessWidget {
             ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: List.generate(items.length, (index) {
-              final item = items[index];
-              final isSelected = index == currentIndex;
-
-              return Expanded(
-                child: Semantics(
-                  selected: isSelected,
-                  label: item.label,
-                  button: true,
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: () {
-                      Feedback.forTap(context);
-                      onTap(index);
-                    },
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 3),
-                      padding: const EdgeInsets.symmetric(vertical: 2),
-                      color: Colors.transparent,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          AnimatedScale(
-                            scale: isSelected ? 1.08 : 1.0,
-                            duration: const Duration(milliseconds: 200),
-                            curve: Curves.easeOutBack,
-                            child: Icon(
-                              isSelected ? item.activeIcon : item.icon,
-                              size: isSelected ? 22 : 24,
-                              color: isSelected
-                                  ? AppColors.crispCarrot
-                                  : AppColors.textSecondary,
-                            ),
-                          ),
-                          AnimatedCrossFade(
-                            duration: const Duration(milliseconds: 200),
-                            firstCurve: Curves.easeIn,
-                            secondCurve: Curves.easeOut,
-                            sizeCurve: Curves.easeOutCubic,
-                            crossFadeState: (isSelected || !onlyShowSelectedLabel)
-                                ? CrossFadeState.showFirst
-                                : CrossFadeState.showSecond,
-                            firstChild: Padding(
-                              padding: const EdgeInsets.only(top: 2),
-                              child: AnimatedDefaultTextStyle(
-                                duration: const Duration(milliseconds: 200),
-                                style: AppTypography.labelSmall.copyWith(
-                                  fontSize: 11,
-                                  fontWeight: isSelected
-                                      ? FontWeight.w700
-                                      : FontWeight.w500,
-                                  color: isSelected
-                                      ? AppColors.crispCarrot
-                                      : AppColors.textSecondary,
-                                ),
-                                child: Text(
-                                  item.label,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ),
-                            secondChild: const SizedBox(
-                              width: double.infinity,
-                              height: 0,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            }),
+            children: [
+              for (var index = 0; index < items.length; index++) ...[
+                if (centerAction != null && index == centerSlot)
+                  Expanded(child: Center(child: centerAction)),
+                _buildNavItem(context, items[index], index),
+              ],
+              if (centerAction != null && centerSlot >= items.length)
+                Expanded(child: Center(child: centerAction)),
+            ],
           ),
         ],
       ),
@@ -200,9 +149,9 @@ class LiquidGlassNavigationBar extends StatelessWidget {
       return Container(
         padding: EdgeInsets.only(bottom: bottomPadding),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.85),
-          border: const Border(
-            top: BorderSide(color: AppColors.border, width: 1),
+          color: scheme.surface.withValues(alpha: isDark ? 0.94 : 0.85),
+          border: Border(
+            top: BorderSide(color: scheme.outlineVariant, width: 1),
           ),
         ),
         child: glassPill,
@@ -227,6 +176,156 @@ class LiquidGlassNavigationBar extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildNavItem(
+    BuildContext context,
+    LiquidGlassNavItem item,
+    int index,
+  ) {
+    final isSelected = index == currentIndex;
+
+    return Expanded(
+      child: Semantics(
+        selected: isSelected,
+        label: item.label,
+        button: true,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () {
+            Feedback.forTap(context);
+            onTap(index);
+          },
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 3),
+            padding: const EdgeInsets.symmetric(vertical: 2),
+            color: Colors.transparent,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AnimatedScale(
+                  scale: isSelected ? 1.08 : 1.0,
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeOutBack,
+                  child: Icon(
+                    isSelected ? item.activeIcon : item.icon,
+                    size: isSelected ? 22 : 24,
+                    color: isSelected
+                        ? AppColors.crispCarrot
+                        : Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                AnimatedCrossFade(
+                  duration: const Duration(milliseconds: 200),
+                  firstCurve: Curves.easeIn,
+                  secondCurve: Curves.easeOut,
+                  sizeCurve: Curves.easeOutCubic,
+                  crossFadeState: (isSelected || !onlyShowSelectedLabel)
+                      ? CrossFadeState.showFirst
+                      : CrossFadeState.showSecond,
+                  firstChild: Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: AnimatedDefaultTextStyle(
+                      duration: const Duration(milliseconds: 200),
+                      style: AppTypography.labelSmall.copyWith(
+                        fontSize: 11,
+                        fontWeight: isSelected
+                            ? FontWeight.w700
+                            : FontWeight.w500,
+                        color: isSelected
+                            ? AppColors.crispCarrot
+                            : Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                      child: Text(
+                        item.label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
+                  secondChild: const SizedBox(
+                    width: double.infinity,
+                    height: 0,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Tombol keranjang utama di tengah navigation bar, lengkap dengan badge
+/// jumlah item.
+class LiquidGlassCartNavAction extends StatelessWidget {
+  const LiquidGlassCartNavAction({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final cateringService = CateringService();
+
+    return ListenableBuilder(
+      listenable: cateringService,
+      builder: (context, _) {
+        final count = cateringService.cartItemCount;
+
+        return Semantics(
+          button: true,
+          label: 'Keranjang',
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () {
+              Feedback.forTap(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const CartScreen()),
+              );
+            },
+            child: Badge(
+              isLabelVisible: count > 0,
+              backgroundColor: Colors.white,
+              textColor: AppColors.crispCarrot,
+              offset: const Offset(-2, -2),
+              label: Text(
+                '$count',
+                style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              child: Container(
+                width: 46,
+                height: 46,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [AppColors.crispCarrot, Color(0xFFD94A0A)],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.crispCarrot.withValues(alpha: 0.35),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.shopping_bag_rounded,
+                  color: Colors.white,
+                  size: 23,
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

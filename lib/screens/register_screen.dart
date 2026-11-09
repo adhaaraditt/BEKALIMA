@@ -5,16 +5,7 @@ import '../widgets/liquid_glass_app_bar_components.dart';
 import 'login_screen.dart';
 import 'main_navigation_screen.dart';
 
-/// Halaman Daftar (Register) BEKALIMA sesuai mockup desain:
-/// - Header oranye dengan tombol kembali (←), tombol 'Masuk' di kanan atas,
-///   judul 'Daftar', dan subtitle 'Silahkan membuat akun terlebih dahulu'.
-/// - Card putih melengkung dengan field:
-///   1. Email
-///   2. Username
-///   3. No Telepon
-///   4. Password (dengan toggle visibility)
-///   5. Ulangi Password (dengan toggle visibility)
-/// - Tombol utama 'Daftar' berwarna kuning/oranye terang.
+
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
@@ -101,9 +92,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         size: 40,
                         child: IconButton(
                           onPressed: () => Navigator.of(context).pop(),
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.arrow_back_rounded,
-                            color: AppColors.textPrimary,
+                            color: Theme.of(context).colorScheme.onSurface,
                             size: 22,
                           ),
                           padding: EdgeInsets.zero,

@@ -19,4 +19,13 @@ abstract final class AppColors {
   static const Color deepTeal = Color(0xFF02323D);
   static const Color teal = Color(0xFF0B5B67);
   static const Color tealBright = Color(0xFF2FBCB3);
+
+  // Palet mode gelap (hangat, bukan hitam pekat) agar nuansa kuliner tetap terjaga.
+  static const Color darkBackground = Color(0xFF14110D);
+  static const Color darkSurface = Color(0xFF1F1A14);
+  static const Color darkSurfaceHigh = Color(0xFF2A241D);
+  static const Color darkBorder = Color(0xFF3D342B);
+  static const Color darkTextPrimary = Color(0xFFF5EFE5);
+  static const Color darkTextSecondary = Color(0xFFC4B7A8);
+  static const Color greenAccent = Color(0xFF82D79C);
 }

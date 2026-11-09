@@ -92,7 +92,7 @@ void main() {
     final updatedIndicator = tester.widget<AnimatedAlign>(
       find.byType(AnimatedAlign),
     );
-    expect((updatedIndicator.alignment as Alignment).x, closeTo(-0.33, 0.05));
+    expect((updatedIndicator.alignment as Alignment).x, closeTo(-0.5, 0.05));
 
     final updatedMenuCrossFade = tester.widget<AnimatedCrossFade>(
       find.byWidgetPredicate((widget) =>

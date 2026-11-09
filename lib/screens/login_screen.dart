@@ -1,4 +1,3 @@
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../services/catering_service.dart';
 import '../theme/app_colors.dart';
@@ -6,13 +5,7 @@ import '../widgets/liquid_glass_app_bar_components.dart';
 import 'main_navigation_screen.dart';
 import 'register_screen.dart';
 
-/// Halaman Masuk (Login) BEKALIMA sesuai mockup desain:
-/// - Header oranye dengan tombol kembali (←), tombol 'Daftar' di kanan atas,
-///   judul 'Masuk', dan subtitle 'Silahkan Masuk akun apabila sudah mempunyai akun'.
-/// - Card putih melengkung dengan field Username/Email dan Password (dengan toggle visibility).
-/// - Link 'Lupa Password?' di bawah kolom password.
-/// - Tombol utama 'Masuk' berwarna kuning/oranye terang.
-/// - Pembatas 'Atau' dan tombol sosial login 'Continue With Google' & 'Continue With Facebook'.
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -218,9 +211,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         size: 40,
                         child: IconButton(
                           onPressed: () => Navigator.of(context).pop(),
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.arrow_back_rounded,
-                            color: AppColors.textPrimary,
+                            color: Theme.of(context).colorScheme.onSurface,
                             size: 22,
                           ),
                           padding: EdgeInsets.zero,
@@ -423,7 +416,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     const SizedBox(height: 24),
 
-                    // Tombol 'Masuk' (Kuning/Oranye terang)
                     SizedBox(
                       width: double.infinity,
                       height: 52,
@@ -512,7 +504,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                 color: Colors.white,
                               ),
                               alignment: Alignment.center,
-                              child: const _GoogleLogo(size: 18),
+                              child: Image.asset(
+                                'assets/images/google_logo.png',
+                                width: 18,
+                                height: 18,
+                                fit: BoxFit.contain,
+                              ),
                             ),
                             const SizedBox(width: 14),
                             const Expanded(
@@ -600,65 +597,4 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-}
-
-/// Logo Google empat warna, digambar langsung agar tetap tajam tanpa aset tambahan.
-class _GoogleLogo extends StatelessWidget {
-  final double size;
-
-  const _GoogleLogo({this.size = 18});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: size,
-      height: size,
-      child: CustomPaint(painter: _GoogleLogoPainter()),
-    );
-  }
-}
-
-class _GoogleLogoPainter extends CustomPainter {
-  static const _blue = Color(0xFF4285F4);
-  static const _red = Color(0xFFEA4335);
-  static const _yellow = Color(0xFFFBBC05);
-  static const _green = Color(0xFF34A853);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final strokeWidth = size.width * 0.2;
-    final rect = (Offset.zero & size).deflate(strokeWidth / 2);
-    final paint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = strokeWidth;
-
-    void arc(Color color, double startDegrees, double sweepDegrees) {
-      canvas.drawArc(
-        rect,
-        startDegrees * math.pi / 180,
-        sweepDegrees * math.pi / 180,
-        false,
-        paint..color = color,
-      );
-    }
-
-    arc(_green, 10, 85);
-    arc(_yellow, 95, 90);
-    arc(_red, 185, 90);
-    arc(_blue, 275, 77);
-
-    // Batang horizontal biru yang jadi ciri khas huruf G Google.
-    canvas.drawRect(
-      Rect.fromLTRB(
-        size.width * 0.52,
-        size.height * 0.5 - strokeWidth / 2,
-        size.width - strokeWidth / 2,
-        size.height * 0.5 + strokeWidth / 2,
-      ),
-      Paint()..color = _blue,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

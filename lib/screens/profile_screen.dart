@@ -167,7 +167,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const LiquidGlassCartButton(),
+                  const LiquidGlassThemeToggleButton(),
+                  const SizedBox(width: 8),
+                  const LiquidGlassNotificationButton(),
                 ],
               ),
             ),
@@ -305,36 +307,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(height: 8),
                   Card(
                     child: Column(
-                      children: const [
+                      children: [
                         ListTile(
                           leading: Icon(
                             Icons.verified,
-                            color: AppColors.forestGreen,
+                            color: theme.colorScheme.secondary,
                           ),
-                          title: Text('100% Halal & Higienis'),
-                          subtitle: Text(
+                          title: const Text('100% Halal & Higienis'),
+                          subtitle: const Text(
                             'Dipersiapkan dengan standar dapur bersih profesional.',
                           ),
                         ),
-                        Divider(),
+                        const Divider(),
                         ListTile(
-                          leading: Icon(
+                          leading: const Icon(
                             Icons.schedule,
                             color: AppColors.crispCarrot,
                           ),
-                          title: Text('Waktu Pemesanan (Lead Time)'),
-                          subtitle: Text(
+                          title: const Text('Waktu Pemesanan (Lead Time)'),
+                          subtitle: const Text(
                             'Pemesanan minimal H-1 sebelum jam 17:00 WIB.',
                           ),
                         ),
-                        Divider(),
+                        const Divider(),
                         ListTile(
                           leading: Icon(
                             Icons.support_agent,
-                            color: AppColors.forestGreen,
+                            color: theme.colorScheme.secondary,
                           ),
-                          title: Text('Bantuan & Customer Service'),
-                          subtitle: Text(
+                          title: const Text('Bantuan & Customer Service'),
+                          subtitle: const Text(
                             'WhatsApp: +62 812-9988-7766 (08:00 - 20:00 WIB)',
                           ),
                         ),

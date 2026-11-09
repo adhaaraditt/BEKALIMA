@@ -77,7 +77,9 @@ class _MenuCatalogScreenState extends State<MenuCatalogScreen> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const LiquidGlassCartButton(),
+                  const LiquidGlassThemeToggleButton(),
+                  const SizedBox(width: 8),
+                  const LiquidGlassNotificationButton(),
                 ],
               ),
             ),
@@ -90,9 +92,9 @@ class _MenuCatalogScreenState extends State<MenuCatalogScreen> {
                 decoration: InputDecoration(
                   hintText:
                       'Cari menu (misal: Ayam Bakar, Liwet, Prasmanan)...',
-                  prefixIcon: const Icon(
+                  prefixIcon: Icon(
                     Icons.search,
-                    color: AppColors.textSecondary,
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                   suffixIcon: _searchController.text.isNotEmpty
                       ? IconButton(
@@ -124,19 +126,21 @@ class _MenuCatalogScreenState extends State<MenuCatalogScreen> {
                     selected: isSelected,
                     selectedColor: AppColors.crispCarrot,
                     labelStyle: TextStyle(
-                      color: isSelected ? Colors.white : AppColors.textPrimary,
+                      color: isSelected
+                          ? Colors.white
+                          : theme.colorScheme.onSurface,
                       fontWeight: isSelected
                           ? FontWeight.w700
                           : FontWeight.w500,
                       fontSize: 13,
                     ),
-                    backgroundColor: AppColors.cardSurface,
+                    backgroundColor: theme.colorScheme.surface,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                       side: BorderSide(
                         color: isSelected
                             ? AppColors.crispCarrot
-                            : AppColors.border,
+                            : theme.colorScheme.outlineVariant,
                       ),
                     ),
                     showCheckmark: false,
@@ -158,10 +162,10 @@ class _MenuCatalogScreenState extends State<MenuCatalogScreen> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.search_off_rounded,
                               size: 48,
-                              color: AppColors.textDisabled,
+                              color: theme.colorScheme.onSurfaceVariant,
                             ),
                             const SizedBox(height: 12),
                             Text(

@@ -151,9 +151,11 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: AppColors.creamTint,
+                  color: theme.colorScheme.surfaceContainerHigh,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: AppColors.border),
+                  border: Border.all(
+                    color: theme.colorScheme.outlineVariant,
+                  ),
                 ),
                 child: Row(
                   children: [
@@ -210,11 +212,15 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
                 children: widget.menu.packageContents.map((content) {
                   return ListTile(
                     dense: true,
-                    leading: const Icon(Icons.check_circle_outline, size: 20, color: AppColors.forestGreen),
+                    leading: Icon(
+                      Icons.check_circle_outline,
+                      size: 20,
+                      color: theme.colorScheme.secondary,
+                    ),
                     title: Text(
                       content,
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: AppColors.textPrimary,
+                        color: theme.colorScheme.onSurface,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -305,10 +311,12 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
       ),
       bottomSheet: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          border: Border(top: BorderSide(color: AppColors.border)),
-          boxShadow: [
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surface,
+          border: Border(
+            top: BorderSide(color: theme.colorScheme.outlineVariant),
+          ),
+          boxShadow: const [
             BoxShadow(
               color: Colors.black12,
               blurRadius: 8,
@@ -322,9 +330,11 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
               // Pengatur jumlah (+/-)
               Container(
                 decoration: BoxDecoration(
-                  color: AppColors.creamTint,
+                  color: theme.colorScheme.surfaceContainerHigh,
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: AppColors.border),
+                  border: Border.all(
+                    color: theme.colorScheme.outlineVariant,
+                  ),
                 ),
                 child: Row(
                   children: [

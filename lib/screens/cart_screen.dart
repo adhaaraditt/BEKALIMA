@@ -246,7 +246,8 @@ class _CartScreenState extends State<CartScreen> {
                                         style: theme.textTheme.bodySmall
                                             ?.copyWith(
                                               fontStyle: FontStyle.italic,
-                                              color: AppColors.textPrimary,
+                                              color:
+                                                  theme.colorScheme.onSurface,
                                             ),
                                       ),
                                     ),
@@ -282,9 +283,11 @@ class _CartScreenState extends State<CartScreen> {
                             ),
                             Container(
                               decoration: BoxDecoration(
-                                color: AppColors.creamTint,
+                                color: theme.colorScheme.surfaceContainerHigh,
                                 borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: AppColors.border),
+                                border: Border.all(
+                                  color: theme.colorScheme.outlineVariant,
+                                ),
                               ),
                               child: Row(
                                 children: [
@@ -325,10 +328,12 @@ class _CartScreenState extends State<CartScreen> {
           ? null
           : Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                border: Border(top: BorderSide(color: AppColors.border)),
-                boxShadow: [
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surface,
+                border: Border(
+                  top: BorderSide(color: theme.colorScheme.outlineVariant),
+                ),
+                boxShadow: const [
                   BoxShadow(
                     color: Colors.black12,
                     blurRadius: 8,

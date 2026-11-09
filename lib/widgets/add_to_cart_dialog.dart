@@ -157,4 +157,3 @@ class AddToCartSuccessDialog extends StatelessWidget {
     );
   }
 }
-

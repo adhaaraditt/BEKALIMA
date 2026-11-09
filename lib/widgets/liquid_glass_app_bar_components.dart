@@ -2,37 +2,42 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../screens/cart_screen.dart';
 import '../services/catering_service.dart';
+import '../services/theme_controller.dart';
 import '../theme/app_colors.dart';
+import '../theme/glass_palette.dart';
 
 /// Gradien kaca cair yang dipakai bersama oleh elemen header.
 /// Warna dibuat lebih pekat agar bulatan ikon/judul/keranjang lebih tegas.
-LinearGradient _glassGradient() {
+LinearGradient _glassGradient(BuildContext context) {
+  final palette = glassPaletteOf(context);
+
   return LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [
-      Colors.white.withValues(alpha: 0.96),
-      AppColors.cream.withValues(alpha: 0.88),
-    ],
+    colors: [palette.gradientStart, palette.gradientEnd],
   );
 }
 
 /// Bayangan halus agar elemen kaca tetap terpisah dari background.
-List<BoxShadow> _glassShadows() {
+List<BoxShadow> _glassShadows(BuildContext context) {
+  final palette = glassPaletteOf(context);
+
   return [
     BoxShadow(
-      color: AppColors.textPrimary.withValues(alpha: 0.06),
+      color: palette.shadow,
       blurRadius: 14,
       offset: const Offset(0, 4),
       spreadRadius: -2,
     ),
     BoxShadow(
-      color: Colors.white.withValues(alpha: 0.5),
+      color: palette.highlight,
       blurRadius: 4,
       offset: const Offset(0, -1),
     ),
   ];
 }
+
+Color _glassBorder(BuildContext context) => glassPaletteOf(context).border;
 
 /// Wadah liquid glass berbentuk kapsul (kotak membulat) untuk judul header.
 class LiquidGlassCapsule extends StatelessWidget {
@@ -58,13 +63,10 @@ class LiquidGlassCapsule extends StatelessWidget {
         child: Container(
           padding: padding,
           decoration: BoxDecoration(
-            gradient: _glassGradient(),
+            gradient: _glassGradient(context),
             borderRadius: radius,
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.85),
-              width: 1.2,
-            ),
-            boxShadow: _glassShadows(),
+            border: Border.all(color: _glassBorder(context), width: 1.2),
+            boxShadow: _glassShadows(context),
           ),
           child: child,
         ),
@@ -91,16 +93,125 @@ class LiquidGlassCircle extends StatelessWidget {
           alignment: Alignment.center,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            gradient: _glassGradient(),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.85),
-              width: 1.2,
-            ),
-            boxShadow: _glassShadows(),
+            gradient: _glassGradient(context),
+            border: Border.all(color: _glassBorder(context), width: 1.2),
+            boxShadow: _glassShadows(context),
           ),
           child: child,
         ),
       ),
+    );
+  }
+}
+
+/// Tombol notifikasi bergaya liquid glass untuk header.
+class LiquidGlassNotificationButton extends StatelessWidget {
+  const LiquidGlassNotificationButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(22),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(22),
+            onTap: () {
+              ScaffoldMessenger.of(context)
+                ..hideCurrentSnackBar()
+                ..showSnackBar(
+                  const SnackBar(
+                    content: Text('Belum ada notifikasi baru.'),
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+            },
+            child: Container(
+              width: 42,
+              height: 42,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                gradient: _glassGradient(context),
+                borderRadius: BorderRadius.circular(22),
+                border: Border.all(color: _glassBorder(context), width: 1.2),
+                boxShadow: _glassShadows(context),
+              ),
+              child: Icon(
+                Icons.notifications_none_rounded,
+                color: Theme.of(context).colorScheme.onSurface,
+                size: 22,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Tombol sekali ketuk untuk berpindah antara mode terang dan mode gelap.
+class LiquidGlassThemeToggleButton extends StatelessWidget {
+  const LiquidGlassThemeToggleButton({super.key});
+
+  void _toggleTheme(BuildContext context) {
+    final renderObject = context.findRenderObject();
+    final origin = renderObject is RenderBox
+        ? renderObject.localToGlobal(renderObject.size.center(Offset.zero))
+        : null;
+    ThemeController.instance.toggleDarkMode(origin: origin);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = ThemeController.instance;
+
+    return ListenableBuilder(
+      listenable: controller,
+      builder: (context, _) {
+        final isDark = controller.isDarkMode;
+
+        return Tooltip(
+          message: isDark ? 'Mode terang' : 'Mode gelap',
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(22),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(22),
+                  onTap: () => _toggleTheme(context),
+                  child: Container(
+                    width: 42,
+                    height: 42,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      gradient: _glassGradient(context),
+                      borderRadius: BorderRadius.circular(22),
+                      border: Border.all(
+                        color: _glassBorder(context),
+                        width: 1.2,
+                      ),
+                      boxShadow: _glassShadows(context),
+                    ),
+                    child: Icon(
+                      isDark
+                          ? Icons.light_mode_rounded
+                          : Icons.dark_mode_rounded,
+                      color: isDark
+                          ? AppColors.sunshine
+                          : AppColors.textPrimary,
+                      size: 22,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -137,13 +248,13 @@ class LiquidGlassCartButton extends StatelessWidget {
                   height: 42,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    gradient: _glassGradient(),
+                    gradient: _glassGradient(context),
                     borderRadius: BorderRadius.circular(22),
                     border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.85),
+                      color: _glassBorder(context),
                       width: 1.2,
                     ),
-                    boxShadow: _glassShadows(),
+                    boxShadow: _glassShadows(context),
                   ),
                   child: Badge(
                     isLabelVisible: count > 0,
@@ -155,9 +266,9 @@ class LiquidGlassCartButton extends StatelessWidget {
                       ),
                     ),
                     backgroundColor: AppColors.crispCarrot,
-                    child: const Icon(
+                    child: Icon(
                       Icons.shopping_bag_outlined,
-                      color: AppColors.textPrimary,
+                      color: Theme.of(context).colorScheme.onSurface,
                       size: 20,
                     ),
                   ),

@@ -40,6 +40,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         currentIndex: _currentIndex,
         onTap: _onTabSelected,
         isFloating: true,
+        centerAction: const LiquidGlassCartNavAction(),
         items: const [
           LiquidGlassNavItem(
             icon: Icons.home_outlined,
