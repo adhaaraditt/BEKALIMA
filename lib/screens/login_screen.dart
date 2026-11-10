@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import '../services/catering_service.dart';
 import '../theme/app_colors.dart';
 import '../widgets/liquid_glass_app_bar_components.dart';
+import '../widgets/pill_text_field.dart';
 import 'main_navigation_screen.dart';
 import 'register_screen.dart';
-
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -19,6 +19,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final CateringService _cateringService = CateringService();
 
   bool _isPasswordVisible = false;
+  bool _showFieldErrors = false;
 
   @override
   void dispose() {
@@ -29,9 +30,14 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _handleLogin() {
     final input = _usernameController.text.trim();
-    if (input.isNotEmpty) {
-      _cateringService.login(usernameOrEmail: input);
+    final password = _passwordController.text.trim();
+
+    if (input.isEmpty || password.isEmpty) {
+      setState(() => _showFieldErrors = true);
+      return;
     }
+
+    _cateringService.login(usernameOrEmail: input);
 
     Navigator.of(context).pushAndRemoveUntil(
       PageRouteBuilder(
@@ -190,6 +196,8 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     const brandOrange = Color(0xFFFA5805);
+    final usernameMissing = _usernameController.text.trim().isEmpty;
+    final passwordMissing = _passwordController.text.trim().isEmpty;
 
     return Scaffold(
       backgroundColor: brandOrange,
@@ -314,81 +322,43 @@ class _LoginScreenState extends State<LoginScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Field Username / Email
-                    Container(
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFE2E2E2),
-                        borderRadius: BorderRadius.circular(26),
-                      ),
-                      child: TextField(
-                        controller: _usernameController,
-                        style: const TextStyle(
-                          fontFamily: 'Plus Jakarta Sans',
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF222222),
-                        ),
-                        decoration: const InputDecoration(
-                          hintText: 'Username/Email',
-                          hintStyle: TextStyle(
-                            fontFamily: 'Plus Jakarta Sans',
-                            color: Color(0xFF757575),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 22,
-                            vertical: 16,
-                          ),
-                        ),
-                      ),
+                    PillTextField(
+                      controller: _usernameController,
+                      hintText: 'Username/Email',
+                      onChanged: (_) {
+                        if (_showFieldErrors) setState(() {});
+                      },
+                      errorText: _showFieldErrors && usernameMissing
+                          ? 'Harap di isi terlebih dahulu.'
+                          : null,
                     ),
                     const SizedBox(height: 14),
 
                     // Field Password
-                    Container(
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFE2E2E2),
-                        borderRadius: BorderRadius.circular(26),
-                      ),
-                      child: TextField(
-                        controller: _passwordController,
-                        obscureText: !_isPasswordVisible,
-                        style: const TextStyle(
-                          fontFamily: 'Plus Jakarta Sans',
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF222222),
+                    PillTextField(
+                      controller: _passwordController,
+                      hintText: 'Password',
+                      obscureText: !_isPasswordVisible,
+                      onChanged: (_) {
+                        if (_showFieldErrors) setState(() {});
+                      },
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isPasswordVisible
+                              ? Icons.visibility_outlined
+                              : Icons.visibility_off_outlined,
+                          color: const Color(0xFF666666),
+                          size: 22,
                         ),
-                        decoration: InputDecoration(
-                          hintText: 'Password',
-                          hintStyle: const TextStyle(
-                            fontFamily: 'Plus Jakarta Sans',
-                            color: Color(0xFF757575),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 22,
-                            vertical: 16,
-                          ),
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _isPasswordVisible
-                                  ? Icons.visibility_outlined
-                                  : Icons.visibility_off_outlined,
-                              color: const Color(0xFF666666),
-                              size: 22,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                _isPasswordVisible = !_isPasswordVisible;
-                              });
-                            },
-                          ),
-                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isPasswordVisible = !_isPasswordVisible;
+                          });
+                        },
                       ),
+                      errorText: _showFieldErrors && passwordMissing
+                          ? 'Harap di isi terlebih dahulu.'
+                          : null,
                     ),
 
                     // Link Lupa Password?

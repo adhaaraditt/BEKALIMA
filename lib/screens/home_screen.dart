@@ -45,61 +45,44 @@ class _HomeScreenState extends State<HomeScreen> {
         bottom: false,
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-              child: Row(
+            LiquidGlassHeader(
+              leading: LiquidGlassCircle(
+                child: Image.asset(
+                  'assets/images/logo.png',
+                  width: 26,
+                  height: 26,
+                  cacheWidth: logoCacheSize,
+                  cacheHeight: logoCacheSize,
+                  gaplessPlayback: true,
+                  errorBuilder: (context, error, stackTrace) =>
+                      const Text('🍱', style: TextStyle(fontSize: 20)),
+                ),
+              ),
+              titlePadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 6,
+              ),
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  LiquidGlassCircle(
-                    child: Image.asset(
-                      'assets/images/logo.png',
-                      width: 26,
-                      height: 26,
-                      cacheWidth: logoCacheSize,
-                      cacheHeight: logoCacheSize,
-                      gaplessPlayback: true,
-                      errorBuilder: (context, error, stackTrace) =>
-                          const Text('🍱', style: TextStyle(fontSize: 20)),
+                  const Text(
+                    'BEKALIMA',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.crispCarrot,
+                      letterSpacing: -0.5,
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: LiquidGlassCapsule(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Text( 
-                              'BEKALIMA',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w800,
-                                color: AppColors.crispCarrot,
-                                letterSpacing: -0.5,
-                              ),
-                            ),
-                            Text(
-                              'Katering Online Indonesia',
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                fontSize: 9,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ),
-                      ),
+                  Text(
+                    'Katering Online Indonesia',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      fontSize: 9,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(width: 8),
-                  const LiquidGlassThemeToggleButton(),
-                  const SizedBox(width: 8),
-                  const LiquidGlassNotificationButton(),
                 ],
               ),
             ),

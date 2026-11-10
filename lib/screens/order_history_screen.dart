@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/order_item.dart';
 import '../services/catering_service.dart';
 import '../theme/theme.dart';
+import '../utils/currency.dart';
 import '../widgets/liquid_glass_app_bar_components.dart';
 import 'order_detail_screen.dart';
 
@@ -33,25 +34,6 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen>
 
   void _onServiceChanged() {
     if (mounted) setState(() {});
-  }
-
-  String _formatCurrency(int amount) {
-    return 'Rp ${amount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')}';
-  }
-
-  Color _getStatusColor(OrderStatus status) {
-    switch (status) {
-      case OrderStatus.waitingPayment:
-        return AppColors.tomatoBurst;
-      case OrderStatus.processing:
-        return AppColors.crispCarrot;
-      case OrderStatus.shipped:
-        return AppColors.kiwi;
-      case OrderStatus.completed:
-        return Theme.of(context).colorScheme.secondary;
-      case OrderStatus.cancelled:
-        return AppColors.textDisabled;
-    }
   }
 
   List<OrderItem> _filterOrders(int tabIndex) {
@@ -88,40 +70,19 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen>
         bottom: false,
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-              child: Row(
-                children: [
-                  const LiquidGlassCircle(
-                    child: Icon(
-                      Icons.receipt_long_rounded,
-                      color: AppColors.crispCarrot,
-                      size: 22,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: LiquidGlassCapsule(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 8,
-                        ),
-                        child: Text(
-                          'Pesanan Saya',
-                          style: theme.textTheme.titleMedium,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  const LiquidGlassThemeToggleButton(),
-                  const SizedBox(width: 8),
-                  const LiquidGlassNotificationButton(),
-                ],
+            LiquidGlassHeader(
+              leading: const LiquidGlassCircle(
+                child: Icon(
+                  Icons.receipt_long_rounded,
+                  color: AppColors.crispCarrot,
+                  size: 22,
+                ),
+              ),
+              title: Text(
+                'Pesanan Saya',
+                style: theme.textTheme.titleMedium,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
             TabBar(
@@ -175,7 +136,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen>
                     itemCount: list.length,
                     itemBuilder: (ctx, i) {
                       final order = list[i];
-                      final statusColor = _getStatusColor(order.status);
+                      final statusColor = orderStatusColor(context, order.status);
 
                       return Card(
                         margin: const EdgeInsets.only(bottom: 14),
@@ -286,7 +247,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen>
                                           style: theme.textTheme.bodySmall,
                                         ),
                                         Text(
-                                          _formatCurrency(order.totalPrice),
+                                          formatRupiah(order.totalPrice),
                                           style: theme.textTheme.titleSmall
                                               ?.copyWith(
                                                 color: AppColors.crispCarrot,

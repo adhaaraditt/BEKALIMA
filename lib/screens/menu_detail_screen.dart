@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/menu_item.dart';
 import '../services/catering_service.dart';
 import '../theme/theme.dart';
+import '../utils/currency.dart';
 import '../widgets/add_to_cart_dialog.dart';
 
 class MenuDetailScreen extends StatefulWidget {
@@ -28,10 +29,6 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
   void dispose() {
     _noteController.dispose();
     super.dispose();
-  }
-
-  String _formatCurrency(int amount) {
-    return 'Rp ${amount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')}';
   }
 
   void _increment() {
@@ -129,7 +126,7 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    _formatCurrency(widget.menu.price),
+                    formatRupiah(widget.menu.price),
                     style: theme.textTheme.displayMedium?.copyWith(
                       color: AppColors.crispCarrot,
                       fontWeight: FontWeight.w700,
@@ -367,7 +364,7 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
                         style: TextStyle(fontWeight: FontWeight.w700),
                       ),
                       Text(
-                        _formatCurrency(totalPrice),
+                        formatRupiah(totalPrice),
                         style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
                       ),
                     ],

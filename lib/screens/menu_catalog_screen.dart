@@ -47,40 +47,19 @@ class _MenuCatalogScreenState extends State<MenuCatalogScreen> {
         bottom: false,
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-              child: Row(
-                children: [
-                  const LiquidGlassCircle(
-                    child: Icon(
-                      Icons.restaurant_menu_rounded,
-                      color: AppColors.crispCarrot,
-                      size: 22,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: LiquidGlassCapsule(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 8,
-                        ),
-                        child: Text(
-                          'Katalog Menu',
-                          style: theme.textTheme.titleMedium,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  const LiquidGlassThemeToggleButton(),
-                  const SizedBox(width: 8),
-                  const LiquidGlassNotificationButton(),
-                ],
+            LiquidGlassHeader(
+              leading: const LiquidGlassCircle(
+                child: Icon(
+                  Icons.restaurant_menu_rounded,
+                  color: AppColors.crispCarrot,
+                  size: 22,
+                ),
+              ),
+              title: Text(
+                'Katalog Menu',
+                style: theme.textTheme.titleMedium,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
             // Bar Pencarian

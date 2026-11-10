@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/order_item.dart';
 import '../services/catering_service.dart';
 import '../theme/theme.dart';
+import '../utils/currency.dart';
 
 class OrderDetailScreen extends StatefulWidget {
   final OrderItem order;
@@ -14,25 +15,6 @@ class OrderDetailScreen extends StatefulWidget {
 
 class _OrderDetailScreenState extends State<OrderDetailScreen> {
   final CateringService _cateringService = CateringService();
-
-  String _formatCurrency(int amount) {
-    return 'Rp ${amount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')}';
-  }
-
-  Color _getStatusColor(OrderStatus status) {
-    switch (status) {
-      case OrderStatus.waitingPayment:
-        return AppColors.tomatoBurst;
-      case OrderStatus.processing:
-        return AppColors.crispCarrot;
-      case OrderStatus.shipped:
-        return AppColors.kiwi;
-      case OrderStatus.completed:
-        return Theme.of(context).colorScheme.secondary;
-      case OrderStatus.cancelled:
-        return AppColors.textDisabled;
-    }
-  }
 
   void _showReviewDialog() {
     double selectedRating = 5.0;
@@ -114,7 +96,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final statusColor = _getStatusColor(widget.order.status);
+    final statusColor = orderStatusColor(context, widget.order.status);
 
     return Scaffold(
       appBar: AppBar(
@@ -314,9 +296,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 return ListTile(
                   leading: Text(item.menu.imageEmoji, style: const TextStyle(fontSize: 24)),
                   title: Text(item.menu.name, style: theme.textTheme.titleSmall),
-                  subtitle: Text('${item.quantity} porsi x ${_formatCurrency(item.menu.price)}'),
+                  subtitle: Text('${item.quantity} porsi x ${formatRupiah(item.menu.price)}'),
                   trailing: Text(
-                    _formatCurrency(item.subtotal),
+                    formatRupiah(item.subtotal),
                     style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
                   ),
                 );
@@ -348,7 +330,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                     children: [
                       Text('Total Keseluruhan', style: theme.textTheme.titleMedium),
                       Text(
-                        _formatCurrency(widget.order.totalPrice),
+                        formatRupiah(widget.order.totalPrice),
                         style: theme.textTheme.titleMedium?.copyWith(
                           color: AppColors.crispCarrot,
                           fontWeight: FontWeight.w700,

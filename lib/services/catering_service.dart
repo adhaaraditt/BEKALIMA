@@ -235,6 +235,7 @@ class CateringService extends ChangeNotifier {
   String userName = 'Raditya Pratama';
   String userEmail = 'raditya@bekalima.com';
   String userPhone = '0812-3456-7890';
+  String password = 'bekalima123';
   List<String> savedAddresses = [
     'Jl. Merpati No. 12, Kebayoran Baru, Jakarta Selatan (Rumah)',
     'Gedung Cyber 2 Tower Lt. 15, Jl. H.R. Rasuna Said, Kuningan (Kantor)',
@@ -250,6 +251,22 @@ class CateringService extends ChangeNotifier {
     userPhone = phone;
     userEmail = email;
     notifyListeners();
+  }
+
+  /// Mengembalikan pesan error, atau null kalau password berhasil diganti.
+  String? changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) {
+    if (currentPassword != password) {
+      return 'Password lama tidak sesuai.';
+    }
+    if (newPassword.length < 6) {
+      return 'Password baru minimal 6 karakter.';
+    }
+    password = newPassword;
+    notifyListeners();
+    return null;
   }
 
   void login({required String usernameOrEmail}) {

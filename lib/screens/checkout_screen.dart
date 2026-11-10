@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/catering_service.dart';
 import '../theme/theme.dart';
+import '../utils/currency.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -47,10 +48,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     _timeController.dispose();
     _notesController.dispose();
     super.dispose();
-  }
-
-  String _formatCurrency(int amount) {
-    return 'Rp ${amount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')}';
   }
 
   void _submitOrder() {
@@ -106,7 +103,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   const Text('Metode Pembayaran:', style: TextStyle(fontSize: 12)),
                   Text(newOrder.paymentMethod, style: const TextStyle(fontWeight: FontWeight.w600)),
                   const SizedBox(height: 4),
-                  Text('Total: ${_formatCurrency(newOrder.totalPrice)}', style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.crispCarrot)),
+                  Text('Total: ${formatRupiah(newOrder.totalPrice)}', style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.crispCarrot)),
                 ],
               ),
             ),
@@ -288,7 +285,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   children: [
                     Text('Total Tagihan', style: theme.textTheme.bodySmall),
                     Text(
-                      _formatCurrency(totalAmount),
+                      formatRupiah(totalAmount),
                       style: theme.textTheme.titleMedium?.copyWith(
                         color: AppColors.crispCarrot,
                         fontWeight: FontWeight.w700,

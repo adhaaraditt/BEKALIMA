@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Menyimpan pilihan tema aplikasi dan memberi tahu MaterialApp saat berubah,
-/// sehingga mode gelap langsung aktif tanpa perlu restart.
 class ThemeController extends ChangeNotifier {
   ThemeController._();
 
@@ -9,7 +7,6 @@ class ThemeController extends ChangeNotifier {
 
   ThemeMode _themeMode = ThemeMode.light;
 
-  /// Titik asal animasi reveal, diambil dari posisi tombol tema saat ditekan.
   Offset? _toggleOrigin;
 
   ThemeMode get themeMode => _themeMode;

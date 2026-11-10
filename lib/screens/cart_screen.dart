@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/catering_service.dart';
 import '../theme/theme.dart';
+import '../utils/currency.dart';
 import '../widgets/clear_cart_dialog.dart';
 import 'checkout_screen.dart';
 
@@ -28,10 +29,6 @@ class _CartScreenState extends State<CartScreen> {
 
   void _onServiceChanged() {
     if (mounted) setState(() {});
-  }
-
-  String _formatCurrency(int amount) {
-    return 'Rp ${amount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')}';
   }
 
   @override
@@ -149,7 +146,7 @@ class _CartScreenState extends State<CartScreen> {
                                     style: theme.textTheme.bodyMedium,
                                   ),
                                   Text(
-                                    _formatCurrency(subtotal),
+                                    formatRupiah(subtotal),
                                     style: theme.textTheme.titleSmall,
                                   ),
                                 ],
@@ -164,7 +161,7 @@ class _CartScreenState extends State<CartScreen> {
                                     style: theme.textTheme.bodyMedium,
                                   ),
                                   Text(
-                                    _formatCurrency(packagingFee),
+                                    formatRupiah(packagingFee),
                                     style: theme.textTheme.titleSmall,
                                   ),
                                 ],
@@ -182,7 +179,7 @@ class _CartScreenState extends State<CartScreen> {
                                         ?.copyWith(fontWeight: FontWeight.w700),
                                   ),
                                   Text(
-                                    _formatCurrency(grandTotal),
+                                    formatRupiah(grandTotal),
                                     style: theme.textTheme.headlineMedium
                                         ?.copyWith(
                                           color: AppColors.crispCarrot,
@@ -235,7 +232,7 @@ class _CartScreenState extends State<CartScreen> {
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    '${_formatCurrency(cartItem.menu.price)} / porsi',
+                                    '${formatRupiah(cartItem.menu.price)} / porsi',
                                     style: theme.textTheme.bodySmall,
                                   ),
                                   if (cartItem.specialNote != null)
@@ -275,7 +272,7 @@ class _CartScreenState extends State<CartScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Subtotal: ${_formatCurrency(cartItem.subtotal)}',
+                              'Subtotal: ${formatRupiah(cartItem.subtotal)}',
                               style: theme.textTheme.titleSmall?.copyWith(
                                 color: AppColors.crispCarrot,
                                 fontWeight: FontWeight.w700,
@@ -354,7 +351,7 @@ class _CartScreenState extends State<CartScreen> {
                             style: theme.textTheme.bodySmall,
                           ),
                           Text(
-                            _formatCurrency(grandTotal),
+                            formatRupiah(grandTotal),
                             style: theme.textTheme.titleMedium?.copyWith(
                               color: AppColors.crispCarrot,
                               fontWeight: FontWeight.w700,

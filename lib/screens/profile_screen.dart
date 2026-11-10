@@ -60,6 +60,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
               keyboardType: TextInputType.emailAddress,
               decoration: const InputDecoration(labelText: 'Email'),
             ),
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton.icon(
+                icon: const Icon(Icons.lock_outline_rounded, size: 18),
+                label: const Text('Ubah Password'),
+                onPressed: _showChangePasswordDialog,
+              ),
+            ),
           ],
         ),
         actions: [
@@ -85,6 +94,88 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: const Text('Simpan'),
           ),
         ],
+      ),
+    );
+  }
+
+  void _showChangePasswordDialog() {
+    final currentCtrl = TextEditingController();
+    final newCtrl = TextEditingController();
+    final confirmCtrl = TextEditingController();
+    String? error;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: const Text('Ubah Password'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: currentCtrl,
+                obscureText: true,
+                decoration: const InputDecoration(labelText: 'Password Lama'),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: newCtrl,
+                obscureText: true,
+                decoration: const InputDecoration(labelText: 'Password Baru'),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: confirmCtrl,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'Ulangi Password Baru',
+                ),
+              ),
+              if (error != null) ...[
+                const SizedBox(height: 12),
+                Text(
+                  error!,
+                  style: TextStyle(
+                    color: Theme.of(ctx).colorScheme.error,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Batal'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (newCtrl.text != confirmCtrl.text) {
+                  setDialogState(
+                    () => error = 'Ulangi password baru belum sama.',
+                  );
+                  return;
+                }
+                final serviceError = _cateringService.changePassword(
+                  currentPassword: currentCtrl.text,
+                  newPassword: newCtrl.text,
+                );
+                if (serviceError != null) {
+                  setDialogState(() => error = serviceError);
+                  return;
+                }
+                Navigator.pop(ctx);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    backgroundColor: AppColors.forestGreen,
+                    content: Text('Password berhasil diubah.'),
+                  ),
+                );
+              },
+              child: const Text('Simpan'),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -137,40 +228,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
         bottom: false,
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-              child: Row(
-                children: [
-                  const LiquidGlassCircle(
-                    child: Icon(
-                      Icons.person_rounded,
-                      color: AppColors.crispCarrot,
-                      size: 22,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: LiquidGlassCapsule(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 8,
-                        ),
-                        child: Text(
-                          'Profil Saya',
-                          style: theme.textTheme.titleMedium,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  const LiquidGlassThemeToggleButton(),
-                  const SizedBox(width: 8),
-                  const LiquidGlassNotificationButton(),
-                ],
+            LiquidGlassHeader(
+              leading: const LiquidGlassCircle(
+                child: Icon(
+                  Icons.person_rounded,
+                  color: AppColors.crispCarrot,
+                  size: 22,
+                ),
+              ),
+              title: Text(
+                'Profil Saya',
+                style: theme.textTheme.titleMedium,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
             Expanded(

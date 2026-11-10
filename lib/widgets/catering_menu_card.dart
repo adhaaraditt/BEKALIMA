@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/menu_item.dart';
 import '../theme/theme.dart';
+import '../utils/currency.dart';
 
 class CateringMenuCard extends StatelessWidget {
   final MenuItem menu;
@@ -13,10 +14,6 @@ class CateringMenuCard extends StatelessWidget {
     required this.onTap,
     required this.onAddToCart,
   });
-
-  String _formatCurrency(int amount) {
-    return 'Rp ${amount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')}';
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -137,7 +134,7 @@ class CateringMenuCard extends StatelessWidget {
                         style: theme.textTheme.bodySmall,
                       ),
                       Text(
-                        _formatCurrency(menu.price),
+                        formatRupiah(menu.price),
                         style: theme.textTheme.titleMedium?.copyWith(
                           color: AppColors.crispCarrot,
                           fontWeight: FontWeight.w700,

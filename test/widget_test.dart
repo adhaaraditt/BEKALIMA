@@ -55,7 +55,19 @@ void main() {
     expect(find.text('No Telepon'), findsOneWidget);
     expect(find.text('Ulangi Password'), findsOneWidget);
 
-    // 4. Submit Daftar dan masuk ke Main App
+    // 4. Submit kosong: tampilkan pesan wajib isi
+    await tester.tap(find.byKey(const ValueKey('submit_register_button')));
+    await tester.pump();
+
+    expect(find.text('Harap di isi terlebih dahulu.'), findsNWidgets(5));
+
+    // Isi semua field lalu submit
+    await tester.enterText(find.byType(TextField).at(0), 'raditya@bekalima.com');
+    await tester.enterText(find.byType(TextField).at(1), 'raditya');
+    await tester.enterText(find.byType(TextField).at(2), '081234567890');
+    await tester.enterText(find.byType(TextField).at(3), 'bekalima123');
+    await tester.enterText(find.byType(TextField).at(4), 'bekalima123');
+
     await tester.tap(find.byKey(const ValueKey('submit_register_button')));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));

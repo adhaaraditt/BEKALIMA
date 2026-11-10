@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../models/order_item.dart';
 
 abstract final class AppColors {
   static const Color crispCarrot = Color(0xFFF86015);
@@ -28,4 +29,19 @@ abstract final class AppColors {
   static const Color darkTextPrimary = Color(0xFFF5EFE5);
   static const Color darkTextSecondary = Color(0xFFC4B7A8);
   static const Color greenAccent = Color(0xFF82D79C);
+}
+
+Color orderStatusColor(BuildContext context, OrderStatus status) {
+  switch (status) {
+    case OrderStatus.waitingPayment:
+      return AppColors.tomatoBurst;
+    case OrderStatus.processing:
+      return AppColors.crispCarrot;
+    case OrderStatus.shipped:
+      return AppColors.kiwi;
+    case OrderStatus.completed:
+      return Theme.of(context).colorScheme.secondary;
+    case OrderStatus.cancelled:
+      return AppColors.textDisabled;
+  }
 }

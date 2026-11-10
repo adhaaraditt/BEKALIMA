@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import '../services/catering_service.dart';
 import '../theme/app_colors.dart';
 import '../widgets/liquid_glass_app_bar_components.dart';
+import '../widgets/pill_text_field.dart';
 import 'login_screen.dart';
 import 'main_navigation_screen.dart';
-
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -25,6 +25,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
+  bool _showFieldErrors = false;
 
   @override
   void dispose() {
@@ -40,12 +41,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final email = _emailController.text.trim();
     final username = _usernameController.text.trim();
     final phone = _phoneController.text.trim();
+    final password = _passwordController.text.trim();
+    final confirmPassword = _confirmPasswordController.text.trim();
 
-    _cateringService.register(
-      email: email.isNotEmpty ? email : 'pelanggan@bekalima.com',
-      username: username.isNotEmpty ? username : 'Pengguna Bekalima',
-      phone: phone.isNotEmpty ? phone : '0812-3456-7890',
-    );
+    if (email.isEmpty ||
+        username.isEmpty ||
+        phone.isEmpty ||
+        password.isEmpty ||
+        confirmPassword.isEmpty) {
+      setState(() => _showFieldErrors = true);
+      return;
+    }
+
+    _cateringService.register(email: email, username: username, phone: phone);
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -195,52 +203,90 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // 1. Email
-                    _buildInputField(
+                    PillTextField(
                       controller: _emailController,
                       hintText: 'Email',
                       keyboardType: TextInputType.emailAddress,
+                      onChanged: (_) => _refreshErrors(),
+                      errorText: _fieldError(
+                        _emailController.text.trim().isEmpty,
+                      ),
                     ),
                     const SizedBox(height: 14),
 
                     // 2. Username
-                    _buildInputField(
+                    PillTextField(
                       controller: _usernameController,
                       hintText: 'Username',
+                      onChanged: (_) => _refreshErrors(),
+                      errorText: _fieldError(
+                        _usernameController.text.trim().isEmpty,
+                      ),
                     ),
                     const SizedBox(height: 14),
 
                     // 3. No Telepon
-                    _buildInputField(
+                    PillTextField(
                       controller: _phoneController,
                       hintText: 'No Telepon',
                       keyboardType: TextInputType.phone,
+                      onChanged: (_) => _refreshErrors(),
+                      errorText: _fieldError(
+                        _phoneController.text.trim().isEmpty,
+                      ),
                     ),
                     const SizedBox(height: 14),
 
                     // 4. Password
-                    _buildPasswordField(
+                    PillTextField(
                       controller: _passwordController,
                       hintText: 'Password',
-                      isVisible: _isPasswordVisible,
-                      onToggleVisibility: () {
-                        setState(() {
-                          _isPasswordVisible = !_isPasswordVisible;
-                        });
-                      },
+                      obscureText: !_isPasswordVisible,
+                      onChanged: (_) => _refreshErrors(),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isPasswordVisible
+                              ? Icons.visibility_outlined
+                              : Icons.visibility_off_outlined,
+                          color: const Color(0xFF666666),
+                          size: 22,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isPasswordVisible = !_isPasswordVisible;
+                          });
+                        },
+                      ),
+                      errorText: _fieldError(
+                        _passwordController.text.trim().isEmpty,
+                      ),
                     ),
                     const SizedBox(height: 14),
 
                     // 5. Ulangi Password
-                    _buildPasswordField(
+                    PillTextField(
                       controller: _confirmPasswordController,
                       hintText: 'Ulangi Password',
-                      isVisible: _isConfirmPasswordVisible,
-                      onToggleVisibility: () {
-                        setState(() {
-                          _isConfirmPasswordVisible =
-                              !_isConfirmPasswordVisible;
-                        });
-                      },
+                      obscureText: !_isConfirmPasswordVisible,
+                      onChanged: (_) => _refreshErrors(),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isConfirmPasswordVisible
+                              ? Icons.visibility_outlined
+                              : Icons.visibility_off_outlined,
+                          color: const Color(0xFF666666),
+                          size: 22,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isConfirmPasswordVisible =
+                                !_isConfirmPasswordVisible;
+                          });
+                        },
+                      ),
+                      errorText: _fieldError(
+                        _confirmPasswordController.text.trim().isEmpty,
+                      ),
                     ),
                     const SizedBox(height: 28),
 
@@ -282,88 +328,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  Widget _buildInputField({
-    required TextEditingController controller,
-    required String hintText,
-    TextInputType keyboardType = TextInputType.text,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFFE2E2E2),
-        borderRadius: BorderRadius.circular(26),
-      ),
-      child: TextField(
-        controller: controller,
-        keyboardType: keyboardType,
-        style: const TextStyle(
-          fontFamily: 'Plus Jakarta Sans',
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: Color(0xFF222222),
-        ),
-        decoration: InputDecoration(
-          hintText: hintText,
-          hintStyle: const TextStyle(
-            fontFamily: 'Plus Jakarta Sans',
-            color: Color(0xFF757575),
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 22,
-            vertical: 16,
-          ),
-        ),
-      ),
-    );
+  String? _fieldError(bool isEmpty) {
+    if (!_showFieldErrors || !isEmpty) return null;
+    return 'Harap di isi terlebih dahulu.';
   }
 
-  Widget _buildPasswordField({
-    required TextEditingController controller,
-    required String hintText,
-    required bool isVisible,
-    required VoidCallback onToggleVisibility,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFFE2E2E2),
-        borderRadius: BorderRadius.circular(26),
-      ),
-      child: TextField(
-        controller: controller,
-        obscureText: !isVisible,
-        style: const TextStyle(
-          fontFamily: 'Plus Jakarta Sans',
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: Color(0xFF222222),
-        ),
-        decoration: InputDecoration(
-          hintText: hintText,
-          hintStyle: const TextStyle(
-            fontFamily: 'Plus Jakarta Sans',
-            color: Color(0xFF757575),
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 22,
-            vertical: 16,
-          ),
-          suffixIcon: IconButton(
-            icon: Icon(
-              isVisible
-                  ? Icons.visibility_outlined
-                  : Icons.visibility_off_outlined,
-              color: const Color(0xFF666666),
-              size: 22,
-            ),
-            onPressed: onToggleVisibility,
-          ),
-        ),
-      ),
-    );
+  void _refreshErrors() {
+    if (_showFieldErrors) setState(() {});
   }
 }

@@ -39,6 +39,89 @@ List<BoxShadow> _glassShadows(BuildContext context) {
 
 Color _glassBorder(BuildContext context) => glassPaletteOf(context).border;
 
+/// Baris header standar: ikon, judul, tombol tema, dan notifikasi.
+class LiquidGlassHeader extends StatelessWidget {
+  final Widget leading;
+  final Widget title;
+  final EdgeInsetsGeometry titlePadding;
+
+  const LiquidGlassHeader({
+    super.key,
+    required this.leading,
+    required this.title,
+    this.titlePadding = const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+      child: Row(
+        children: [
+          leading,
+          const SizedBox(width: 8),
+          Expanded(
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: LiquidGlassCapsule(padding: titlePadding, child: title),
+            ),
+          ),
+          const SizedBox(width: 8),
+          const LiquidGlassThemeToggleButton(),
+          const SizedBox(width: 8),
+          const LiquidGlassNotificationButton(),
+        ],
+      ),
+    );
+  }
+}
+
+/// Tombol ikon dengan wadah kaca yang sama untuk tema dan notifikasi.
+class GlassIconButton extends StatelessWidget {
+  final Widget child;
+  final VoidCallback onTap;
+  final String? tooltip;
+
+  const GlassIconButton({
+    super.key,
+    required this.child,
+    required this.onTap,
+    this.tooltip,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final button = ClipRRect(
+      borderRadius: BorderRadius.circular(22),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(22),
+            onTap: onTap,
+            child: Container(
+              width: 42,
+              height: 42,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                gradient: _glassGradient(context),
+                borderRadius: BorderRadius.circular(22),
+                border: Border.all(color: _glassBorder(context), width: 1.2),
+                boxShadow: _glassShadows(context),
+              ),
+              child: child,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    if (tooltip == null) return button;
+    return Tooltip(message: tooltip!, child: button);
+  }
+}
+
 /// Wadah liquid glass berbentuk kapsul (kotak membulat) untuk judul header.
 class LiquidGlassCapsule extends StatelessWidget {
   final Widget child;
@@ -110,42 +193,21 @@ class LiquidGlassNotificationButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(22),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(22),
-            onTap: () {
-              ScaffoldMessenger.of(context)
-                ..hideCurrentSnackBar()
-                ..showSnackBar(
-                  const SnackBar(
-                    content: Text('Belum ada notifikasi baru.'),
-                    behavior: SnackBarBehavior.floating,
-                  ),
-                );
-            },
-            child: Container(
-              width: 42,
-              height: 42,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                gradient: _glassGradient(context),
-                borderRadius: BorderRadius.circular(22),
-                border: Border.all(color: _glassBorder(context), width: 1.2),
-                boxShadow: _glassShadows(context),
-              ),
-              child: Icon(
-                Icons.notifications_none_rounded,
-                color: Theme.of(context).colorScheme.onSurface,
-                size: 22,
-              ),
+    return GlassIconButton(
+      onTap: () {
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            const SnackBar(
+              content: Text('Belum ada notifikasi baru.'),
+              behavior: SnackBarBehavior.floating,
             ),
-          ),
-        ),
+          );
+      },
+      child: Icon(
+        Icons.notifications_none_rounded,
+        color: Theme.of(context).colorScheme.onSurface,
+        size: 22,
       ),
     );
   }
@@ -172,43 +234,13 @@ class LiquidGlassThemeToggleButton extends StatelessWidget {
       builder: (context, _) {
         final isDark = controller.isDarkMode;
 
-        return Tooltip(
-          message: isDark ? 'Mode terang' : 'Mode gelap',
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(22),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(22),
-                  onTap: () => _toggleTheme(context),
-                  child: Container(
-                    width: 42,
-                    height: 42,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      gradient: _glassGradient(context),
-                      borderRadius: BorderRadius.circular(22),
-                      border: Border.all(
-                        color: _glassBorder(context),
-                        width: 1.2,
-                      ),
-                      boxShadow: _glassShadows(context),
-                    ),
-                    child: Icon(
-                      isDark
-                          ? Icons.light_mode_rounded
-                          : Icons.dark_mode_rounded,
-                      color: isDark
-                          ? AppColors.sunshine
-                          : AppColors.textPrimary,
-                      size: 22,
-                    ),
-                  ),
-                ),
-              ),
-            ),
+        return GlassIconButton(
+          tooltip: isDark ? 'Mode terang' : 'Mode gelap',
+          onTap: () => _toggleTheme(context),
+          child: Icon(
+            isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+            color: isDark ? AppColors.sunshine : AppColors.textPrimary,
+            size: 22,
           ),
         );
       },
