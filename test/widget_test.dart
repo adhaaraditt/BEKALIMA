@@ -54,6 +54,12 @@ void main() {
     expect(find.text('Username'), findsOneWidget);
     expect(find.text('No Telepon'), findsOneWidget);
     expect(find.text('Ulangi Password'), findsOneWidget);
+    expect(
+      find.text(
+        'Harus ada huruf besar, angka, simbol, dan minimal 8 karakter.',
+      ),
+      findsOneWidget,
+    );
 
     // 4. Submit kosong: tampilkan pesan wajib isi
     await tester.tap(find.byKey(const ValueKey('submit_register_button')));
@@ -67,6 +73,22 @@ void main() {
     await tester.enterText(find.byType(TextField).at(2), '081234567890');
     await tester.enterText(find.byType(TextField).at(3), 'bekalima123');
     await tester.enterText(find.byType(TextField).at(4), 'bekalima123');
+
+    await tester.tap(find.byKey(const ValueKey('submit_register_button')));
+    await tester.pump();
+
+    // Password lemah ditolak
+    expect(
+      find.text(
+        'Password minimal 8 karakter, harus ada huruf besar, angka, dan simbol.',
+      ),
+      findsOneWidget,
+    );
+    expect(find.text('Katering Online Indonesia'), findsNothing);
+
+    // Isi password kuat lalu submit
+    await tester.enterText(find.byType(TextField).at(3), 'Bekalima123!');
+    await tester.enterText(find.byType(TextField).at(4), 'Bekalima123!');
 
     await tester.tap(find.byKey(const ValueKey('submit_register_button')));
     await tester.pump();

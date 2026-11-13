@@ -2,6 +2,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'screens/welcome_screen.dart';
 import 'services/theme_controller.dart';
 import 'theme/theme.dart';
@@ -132,6 +133,9 @@ class _BekalimaAppState extends State<BekalimaApp>
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
         themeMode: ThemeController.instance.themeMode,
+        locale: const Locale('id'),
+        supportedLocales: const [Locale('id'), Locale('en')],
+        localizationsDelegates: GlobalMaterialLocalizations.delegates,
         themeAnimationStyle: AnimationStyle.noAnimation,
         builder: (context, child) {
           return Stack(

@@ -53,6 +53,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
+    if (!_isPasswordStrong(password)) {
+      setState(() => _showFieldErrors = true);
+      return;
+    }
+
     _cateringService.register(email: email, username: username, phone: phone);
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -257,9 +262,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           });
                         },
                       ),
-                      errorText: _fieldError(
-                        _passwordController.text.trim().isEmpty,
-                      ),
+                      errorText: _passwordError,
+                      helperText:
+                          'Harus ada huruf besar, angka, simbol, dan minimal 8 karakter.',
                     ),
                     const SizedBox(height: 14),
 
@@ -331,6 +336,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String? _fieldError(bool isEmpty) {
     if (!_showFieldErrors || !isEmpty) return null;
     return 'Harap di isi terlebih dahulu.';
+  }
+
+  String? get _passwordError {
+    if (!_showFieldErrors) return null;
+    final password = _passwordController.text.trim();
+    if (password.isEmpty) return 'Harap di isi terlebih dahulu.';
+    if (!_isPasswordStrong(password)) {
+      return 'Password minimal 8 karakter, harus ada huruf besar, angka, dan simbol.';
+    }
+    return null;
+  }
+
+  bool _isPasswordStrong(String value) {
+    if (value.length < 8) return false;
+    final hasUppercase = RegExp(r'[A-Z]').hasMatch(value);
+    final hasDigit = RegExp(r'[0-9]').hasMatch(value);
+    final hasSymbol = RegExp(r'[^A-Za-z0-9]').hasMatch(value);
+    return hasUppercase && hasDigit && hasSymbol;
   }
 
   void _refreshErrors() {

@@ -9,6 +9,7 @@ class PillTextField extends StatelessWidget {
   final ValueChanged<String>? onChanged;
   final Widget? suffixIcon;
   final String? errorText;
+  final String? helperText;
 
   const PillTextField({
     super.key,
@@ -19,6 +20,7 @@ class PillTextField extends StatelessWidget {
     this.onChanged,
     this.suffixIcon,
     this.errorText,
+    this.helperText,
   });
 
   static const TextStyle _textStyle = TextStyle(
@@ -38,6 +40,13 @@ class PillTextField extends StatelessWidget {
   static const TextStyle _errorStyle = TextStyle(
     fontFamily: 'Plus Jakarta Sans',
     color: AppColors.tomatoBurst,
+    fontSize: 12,
+    fontWeight: FontWeight.w500,
+  );
+
+  static const TextStyle _helperStyle = TextStyle(
+    fontFamily: 'Plus Jakarta Sans',
+    color: AppColors.textSecondary,
     fontSize: 12,
     fontWeight: FontWeight.w500,
   );
@@ -89,6 +98,11 @@ class PillTextField extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(left: 22, top: 6),
             child: Text(errorText!, style: _errorStyle),
+          )
+        else if (helperText != null)
+          Padding(
+            padding: const EdgeInsets.only(left: 22, top: 6),
+            child: Text(helperText!, style: _helperStyle),
           ),
       ],
     );

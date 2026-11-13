@@ -21,6 +21,21 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   late TextEditingController _timeController;
   final TextEditingController _notesController = TextEditingController();
 
+  static const _monthNames = [
+    'Januari',
+    'Februari',
+    'Maret',
+    'April',
+    'Mei',
+    'Juni',
+    'Juli',
+    'Agustus',
+    'September',
+    'Oktober',
+    'November',
+    'Desember',
+  ];
+
   String _selectedPayment = 'Transfer Virtual Account BCA';
   final List<String> _paymentMethods = [
     'Transfer Virtual Account BCA',
@@ -35,7 +50,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     _nameController = TextEditingController(text: _cateringService.userName);
     _phoneController = TextEditingController(text: _cateringService.userPhone);
     _addressController = TextEditingController(text: _cateringService.currentAddress);
-    _dateController = TextEditingController(text: '28 Oktober 2026');
+    _dateController = TextEditingController();
     _timeController = TextEditingController(text: '11:00 WIB');
   }
 
@@ -48,6 +63,20 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     _timeController.dispose();
     _notesController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickDate() async {
+    final now = DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: now.add(const Duration(days: 1)),
+      firstDate: now,
+      lastDate: now.add(const Duration(days: 365)),
+      helpText: 'Pilih Tanggal Kirim',
+    );
+    if (picked == null) return;
+    _dateController.text =
+        '${picked.day} ${_monthNames[picked.month - 1]} ${picked.year}';
   }
 
   void _submitOrder() {
@@ -192,8 +221,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 Expanded(
                   child: TextFormField(
                     controller: _dateController,
+                    readOnly: true,
+                    onTap: _pickDate,
                     decoration: const InputDecoration(
                       labelText: 'Tanggal Kirim',
+                      hintText: 'Pilih tanggal',
                       prefixIcon: Icon(Icons.calendar_today, size: 18),
                     ),
                     validator: (v) => v == null || v.isEmpty ? 'Wajib diisi' : null,
