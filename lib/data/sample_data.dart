@@ -42,6 +42,7 @@ abstract final class SampleData {
       reviewCount: 142,
       minOrder: 10,
       imageEmoji: '🍗',
+      imageAsset: 'assets/images/Nasi Kotak Ayam Bakar Madu.png',
       badgeText: 'Paling Laris',
       packageContents: [
         'Ayam Bakar Madu Paha/Dada Rempah',
@@ -62,6 +63,7 @@ abstract final class SampleData {
       reviewCount: 98,
       minOrder: 10,
       imageEmoji: '🍚',
+      imageAsset: 'assets/images/Nasi Liwet Solo Komplit.png',
       badgeText: 'Rekomendasi Chef',
       packageContents: [
         'Nasi Liwet Daun Salam & Sereh Gurih',
@@ -75,13 +77,14 @@ abstract final class SampleData {
     MenuItem(
       id: 'm3',
       categoryId: 'nasi_kotak',
-      name: 'Nasi Box Rendang Daging Sapi',
+      name: 'Nasi Box Rendang',
       description: 'Daging sapi pilihan dimasak rendang rempah Minang selama 6 jam hingga empuk meresap, disajikan bersama sayur daun singkong gulai dan sambal ijo.',
       price: 38000,
       rating: 4.9,
       reviewCount: 176,
       minOrder: 10,
       imageEmoji: '🥩',
+      imageAsset: 'assets/images/Nasi box rendang sapi.png',
       packageContents: [
         'Daging Sapi Rendang Asli Rempah',
         'Nasi Putih Pulen Hangat',
@@ -132,13 +135,14 @@ abstract final class SampleData {
     MenuItem(
       id: 'm6',
       categoryId: 'tumpeng',
-      name: 'Tumpeng Mini Kuning Syukuran',
+      name: 'Nasi Kuning',
       description: 'Tumpeng mini perseorangan dengan mika bulat tebal higienis, nasi kuning rempah kunyit harum dengan 6 macam lauk pauk khas syukuran.',
       price: 35000,
       rating: 5.0,
       reviewCount: 112,
       minOrder: 15,
       imageEmoji: '🍱',
+      imageAsset: 'assets/images/Nasi Kuning.png',
       badgeText: 'Favorit Acara',
       packageContents: [
         'Nasi Kuning Kerucut Daun Pisang',

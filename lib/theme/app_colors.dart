@@ -35,7 +35,7 @@ Color orderStatusColor(BuildContext context, OrderStatus status) {
   switch (status) {
     case OrderStatus.waitingPayment:
       return AppColors.tomatoBurst;
-    case OrderStatus.processing:
+    case OrderStatus.paid:
       return AppColors.crispCarrot;
     case OrderStatus.shipped:
       return AppColors.kiwi;

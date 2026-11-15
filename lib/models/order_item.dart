@@ -3,7 +3,7 @@ import 'review_item.dart';
 
 enum OrderStatus {
   waitingPayment('Menunggu Pembayaran'),
-  processing('Diproses'),
+  paid('Terbayar'),
   shipped('Dikirim'),
   completed('Selesai'),
   cancelled('Dibatalkan');

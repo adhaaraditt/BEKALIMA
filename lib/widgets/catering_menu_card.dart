@@ -81,11 +81,23 @@ class CateringMenuCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(color: AppColors.border),
                     ),
+                    clipBehavior: Clip.antiAlias,
                     alignment: Alignment.center,
-                    child: Text(
-                      menu.imageEmoji,
-                      style: const TextStyle(fontSize: 34),
-                    ),
+                    child: menu.imageAsset != null
+                        ? Image.asset(
+                            menu.imageAsset!,
+                            width: 64,
+                            height: 64,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, _, _) => Text(
+                              menu.imageEmoji,
+                              style: const TextStyle(fontSize: 34),
+                            ),
+                          )
+                        : Text(
+                            menu.imageEmoji,
+                            style: const TextStyle(fontSize: 34),
+                          ),
                   ),
                   const SizedBox(width: 12),
                   // Nama & deskripsi singkat

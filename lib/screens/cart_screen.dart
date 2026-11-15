@@ -215,11 +215,23 @@ class _CartScreenState extends State<CartScreen> {
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(color: AppColors.border),
                               ),
+                              clipBehavior: Clip.antiAlias,
                               alignment: Alignment.center,
-                              child: Text(
-                                cartItem.menu.imageEmoji,
-                                style: const TextStyle(fontSize: 26),
-                              ),
+                              child: cartItem.menu.imageAsset != null
+                                  ? Image.asset(
+                                      cartItem.menu.imageAsset!,
+                                      width: 50,
+                                      height: 50,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (_, _, _) => Text(
+                                        cartItem.menu.imageEmoji,
+                                        style: const TextStyle(fontSize: 26),
+                                      ),
+                                    )
+                                  : Text(
+                                      cartItem.menu.imageEmoji,
+                                      style: const TextStyle(fontSize: 26),
+                                    ),
                             ),
                             const SizedBox(width: 12),
                             Expanded(

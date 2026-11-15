@@ -184,10 +184,11 @@ class CateringService extends ChangeNotifier {
     }
   }
 
+  /// Simulasi pembayaran berhasil: pesanan langsung selesai agar bisa diulas.
   void confirmPayment(String orderId) {
     final index = _orders.indexWhere((o) => o.id == orderId);
     if (index >= 0) {
-      _orders[index].status = OrderStatus.processing;
+      _orders[index].status = OrderStatus.completed;
       notifyListeners();
     }
   }

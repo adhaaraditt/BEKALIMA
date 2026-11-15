@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../screens/cart_screen.dart';
+import '../screens/notifications_screen.dart';
 import '../services/catering_service.dart';
 import '../services/theme_controller.dart';
 import '../theme/app_colors.dart';
@@ -195,14 +196,10 @@ class LiquidGlassNotificationButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GlassIconButton(
       onTap: () {
-        ScaffoldMessenger.of(context)
-          ..hideCurrentSnackBar()
-          ..showSnackBar(
-            const SnackBar(
-              content: Text('Belum ada notifikasi baru.'),
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+        );
       },
       child: Icon(
         Icons.notifications_none_rounded,

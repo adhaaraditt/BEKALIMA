@@ -80,28 +80,52 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: AppColors.border),
             ),
-            alignment: Alignment.center,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+            clipBehavior: Clip.antiAlias,
+            child: Stack(
+              fit: StackFit.expand,
               children: [
-                Text(
-                  widget.menu.imageEmoji,
-                  style: const TextStyle(fontSize: 72),
-                ),
-                const SizedBox(height: 8),
-                if (widget.menu.badgeText != null)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: AppColors.crispCarrot,
-                      borderRadius: BorderRadius.circular(12),
+                if (widget.menu.imageAsset != null)
+                  Image.asset(
+                    widget.menu.imageAsset!,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, _, _) => Center(
+                      child: Text(
+                        widget.menu.imageEmoji,
+                        style: const TextStyle(fontSize: 72),
+                      ),
                     ),
+                  )
+                else
+                  Center(
                     child: Text(
-                      widget.menu.badgeText!,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
+                      widget.menu.imageEmoji,
+                      style: const TextStyle(fontSize: 72),
+                    ),
+                  ),
+                if (widget.menu.badgeText != null)
+                  Positioned(
+                    top: 12,
+                    left: 12,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: AppColors.crispCarrot,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.2),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Text(
+                        widget.menu.badgeText!,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),

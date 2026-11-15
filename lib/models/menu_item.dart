@@ -8,6 +8,7 @@ class MenuItem {
   final int reviewCount;
   final int minOrder;
   final String imageEmoji;
+  final String? imageAsset;
   final List<String> packageContents;
   final String? badgeText;
 
@@ -21,6 +22,7 @@ class MenuItem {
     required this.reviewCount,
     this.minOrder = 5,
     required this.imageEmoji,
+    this.imageAsset,
     required this.packageContents,
     this.badgeText,
   });

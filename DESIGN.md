@@ -75,7 +75,7 @@ Berdasarkan Keputusan Klien PRD Bab 5, diintegrasikan ke sistem token terstruktu
 ## 7. Status Pesanan & Feedback (R-27)
 Sesuai alur PRD Bab 6 & 7:
 1. `Menunggu Pembayaran` (Warna aksen Tomato Burst / Amber dengan countdown waktu)
-2. `Diproses` (Warna Forest Green muda / Cooking icon)
+2. `Terbayar` (Warna Crisp Carrot / Checkmark icon)
 3. `Dikirim` (Warna Crisp Carrot / Delivery icon)
 4. `Selesai` (Warna Forest Green solid / Checkmark)
 5. `Dibatalkan` (Warna abu netral bergaris merah)

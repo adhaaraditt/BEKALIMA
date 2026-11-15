@@ -45,44 +45,59 @@ class _HomeScreenState extends State<HomeScreen> {
         bottom: false,
         child: Column(
           children: [
-            LiquidGlassHeader(
-              leading: LiquidGlassCircle(
-                child: Image.asset(
-                  'assets/images/logo.png',
-                  width: 26,
-                  height: 26,
-                  cacheWidth: logoCacheSize,
-                  cacheHeight: logoCacheSize,
-                  gaplessPlayback: true,
-                  errorBuilder: (context, error, stackTrace) =>
-                      const Text('🍱', style: TextStyle(fontSize: 20)),
-                ),
-              ),
-              titlePadding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 6,
-              ),
-              title: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+              child: Row(
                 children: [
-                  const Text(
-                    'BEKALIMA',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.crispCarrot,
-                      letterSpacing: -0.5,
+                  LiquidGlassCircle(
+                    child: Image.asset(
+                      'assets/images/logo.png',
+                      width: 26,
+                      height: 26,
+                      cacheWidth: logoCacheSize,
+                      cacheHeight: logoCacheSize,
+                      gaplessPlayback: true,
+                      errorBuilder: (context, error, stackTrace) =>
+                          const Text('🍱', style: TextStyle(fontSize: 20)),
                     ),
                   ),
-                  Text(
-                    'Katering Online Indonesia',
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      fontSize: 9,
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: LiquidGlassCapsule(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text(
+                              'BEKALIMA',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.crispCarrot,
+                                letterSpacing: -0.5,
+                              ),
+                            ),
+                            Text(
+                              'Katering Online Indonesia',
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                fontSize: 9,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
+                  const SizedBox(width: 8),
+                  const LiquidGlassCartButton(),
                 ],
               ),
             ),
@@ -127,11 +142,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           vertical: 10,
                         ),
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.surfaceContainerHigh,
+                          color: AppColors.cream,
                           borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: theme.colorScheme.outlineVariant,
-                          ),
+                          border: Border.all(color: AppColors.border),
                         ),
                         child: Row(
                           children: [
@@ -145,19 +158,19 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
+                                  const Text(
                                     'Kirim Katering ke:',
                                     style: TextStyle(
                                       fontSize: 11,
-                                      color: theme.colorScheme.onSurfaceVariant,
+                                      color: AppColors.textSecondary,
                                     ),
                                   ),
                                   Text(
                                     _cateringService.currentAddress,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w600,
-                                      color: theme.colorScheme.onSurface,
+                                      color: AppColors.textPrimary,
                                     ),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
@@ -165,10 +178,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ],
                               ),
                             ),
-                            Icon(
+                            const Icon(
                               Icons.keyboard_arrow_down,
                               size: 20,
-                              color: theme.colorScheme.onSurfaceVariant,
+                              color: AppColors.textSecondary,
                             ),
                           ],
                         ),
@@ -346,8 +359,6 @@ class _HomeScreenState extends State<HomeScreen> {
     required String emoji,
     required VoidCallback onTap,
   }) {
-    final theme = Theme.of(context);
-
     return Expanded(
       child: InkWell(
         onTap: onTap,
@@ -355,9 +366,9 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
           decoration: BoxDecoration(
-            color: theme.colorScheme.surface,
+            color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: theme.colorScheme.outlineVariant),
+            border: Border.all(color: AppColors.border),
           ),
           child: Column(
             children: [
@@ -365,10 +376,10 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 6),
               Text(
                 title,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
-                  color: theme.colorScheme.onSurface,
+                  color: AppColors.textPrimary,
                 ),
                 textAlign: TextAlign.center,
                 maxLines: 1,

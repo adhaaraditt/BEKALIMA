@@ -44,7 +44,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen>
           .where(
             (o) =>
                 o.status == OrderStatus.waitingPayment ||
-                o.status == OrderStatus.processing ||
+                o.status == OrderStatus.paid ||
                 o.status == OrderStatus.shipped,
           )
           .toList();
@@ -208,13 +208,25 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen>
                                           color: AppColors.border,
                                         ),
                                       ),
+                                      clipBehavior: Clip.antiAlias,
                                       alignment: Alignment.center,
-                                      child: Text(
-                                        order.items.isNotEmpty
-                                            ? order.items.first.menu.imageEmoji
-                                            : '🍱',
-                                        style: const TextStyle(fontSize: 22),
-                                      ),
+                                      child: order.items.isNotEmpty && order.items.first.menu.imageAsset != null
+                                          ? Image.asset(
+                                              order.items.first.menu.imageAsset!,
+                                              width: 44,
+                                              height: 44,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (_, _, _) => Text(
+                                                order.items.first.menu.imageEmoji,
+                                                style: const TextStyle(fontSize: 22),
+                                              ),
+                                            )
+                                          : Text(
+                                              order.items.isNotEmpty
+                                                  ? order.items.first.menu.imageEmoji
+                                                  : '🍱',
+                                              style: const TextStyle(fontSize: 22),
+                                            ),
                                     ),
                                     const SizedBox(width: 12),
                                     Expanded(

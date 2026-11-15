@@ -3,6 +3,7 @@ import '../models/order_item.dart';
 import '../services/catering_service.dart';
 import '../theme/theme.dart';
 import '../utils/currency.dart';
+import '../widgets/review_dialog.dart';
 
 class OrderDetailScreen extends StatefulWidget {
   final OrderItem order;
@@ -16,81 +17,38 @@ class OrderDetailScreen extends StatefulWidget {
 class _OrderDetailScreenState extends State<OrderDetailScreen> {
   final CateringService _cateringService = CateringService();
 
-  void _showReviewDialog() {
-    double selectedRating = 5.0;
-    final commentController = TextEditingController();
+  Future<void> _showReviewDialog() async {
+    final result = await ReviewDialog.show(context);
+    if (result == null || !mounted) return;
 
-    showDialog(
-      context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setDialogState) => AlertDialog(
-          title: const Text('Beri Ulasan & Rating'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Bagaimana cita rasa dan layanan katering BEKALIMA?'),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(5, (index) {
-                  final starIndex = index + 1;
-                  return IconButton(
-                    icon: Icon(
-                      starIndex <= selectedRating ? Icons.star_rounded : Icons.star_border_rounded,
-                      color: AppColors.sunshine,
-                      size: 32,
-                    ),
-                    onPressed: () {
-                      setDialogState(() {
-                        selectedRating = starIndex.toDouble();
-                      });
-                    },
-                  );
-                }),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: commentController,
-                maxLines: 3,
-                decoration: const InputDecoration(
-                  hintText: 'Tuliskan ulasan Anda mengenai rasa lauk, ketepatan waktu, dan kemasan...',
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('Batal'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (commentController.text.trim().isNotEmpty) {
-                  final firstMenuId = widget.order.items.isNotEmpty ? widget.order.items.first.menu.id : 'm1';
-                  _cateringService.addReview(
-                    orderId: widget.order.id,
-                    menuId: firstMenuId,
-                    rating: selectedRating,
-                    comment: commentController.text.trim(),
-                    userName: widget.order.recipientName,
-                  );
-                  Navigator.pop(ctx);
-                  setState(() {});
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      backgroundColor: AppColors.forestGreen,
-                      content: Text('Terima kasih! Ulasan Anda telah berhasil disimpan.'),
-                    ),
-                  );
-                }
-              },
-              child: const Text('Kirim Ulasan'),
-            ),
-          ],
-        ),
+    final firstMenuId = widget.order.items.isNotEmpty ? widget.order.items.first.menu.id : 'm1';
+    _cateringService.addReview(
+      orderId: widget.order.id,
+      menuId: firstMenuId,
+      rating: result.rating,
+      comment: result.comment,
+      userName: widget.order.recipientName,
+    );
+    setState(() {});
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Terima kasih! Ulasan Anda telah berhasil disimpan.'),
       ),
     );
+  }
+
+  Future<void> _simulatePaymentSuccess() async {
+    _cateringService.confirmPayment(widget.order.id);
+    setState(() {});
+
+    final wantsReview = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => _PaymentSuccessDialog(orderId: widget.order.id),
+    );
+    if (wantsReview == true && mounted) {
+      await _showReviewDialog();
+    }
   }
 
   @override
@@ -116,7 +74,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             child: Row(
               children: [
                 Icon(
-                  widget.order.status == OrderStatus.completed
+                  widget.order.status == OrderStatus.completed ||
+                  widget.order.status == OrderStatus.paid
                       ? Icons.check_circle
                       : widget.order.status == OrderStatus.cancelled
                           ? Icons.cancel
@@ -156,16 +115,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 Expanded(
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(backgroundColor: AppColors.forestGreen),
-                    onPressed: () {
-                      _cateringService.confirmPayment(widget.order.id);
-                      setState(() {});
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          backgroundColor: AppColors.forestGreen,
-                          content: Text('Pembayaran berhasil dikonfirmasi! Dapur mulai memproses pesanan.'),
-                        ),
-                      );
-                    },
+                    onPressed: _simulatePaymentSuccess,
                     child: const Text('Simulasi Bayar Berhasil'),
                   ),
                 ),
@@ -294,7 +244,18 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             child: Column(
               children: widget.order.items.map((item) {
                 return ListTile(
-                  leading: Text(item.menu.imageEmoji, style: const TextStyle(fontSize: 24)),
+                  leading: item.menu.imageAsset != null
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(6),
+                          child: Image.asset(
+                            item.menu.imageAsset!,
+                            width: 36,
+                            height: 36,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, _, _) => Text(item.menu.imageEmoji, style: const TextStyle(fontSize: 24)),
+                          ),
+                        )
+                      : Text(item.menu.imageEmoji, style: const TextStyle(fontSize: 24)),
                   title: Text(item.menu.name, style: theme.textTheme.titleSmall),
                   subtitle: Text('${item.quantity} porsi x ${formatRupiah(item.menu.price)}'),
                   trailing: Text(
@@ -343,6 +304,80 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Pop-up terpusat setelah simulasi pembayaran berhasil.
+class _PaymentSuccessDialog extends StatelessWidget {
+  final String orderId;
+
+  const _PaymentSuccessDialog({required this.orderId});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final green = theme.colorScheme.secondary;
+
+    return Dialog(
+      backgroundColor: theme.colorScheme.surface,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 420),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 28, 24, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: green.withValues(alpha: 0.14),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.check_circle_rounded,
+                  color: green,
+                  size: 38,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Pembayaran Berhasil!',
+                textAlign: TextAlign.center,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Pesanan $orderId sudah selesai. Bagikan ulasan Anda untuk membantu pelanggan lain.',
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodySmall?.copyWith(height: 1.4),
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                height: 46,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  child: const Text('Beri Ulasan Sekarang'),
+                ),
+              ),
+              const SizedBox(height: 10),
+              TextButton(
+                style: TextButton.styleFrom(
+                  foregroundColor: theme.colorScheme.onSurfaceVariant,
+                ),
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Nanti Saja'),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

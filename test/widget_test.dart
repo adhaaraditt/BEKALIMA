@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:bekalima/main.dart';
+import 'package:bekalima/data/sample_data.dart';
 import 'package:bekalima/widgets/add_to_cart_dialog.dart';
+import 'package:bekalima/widgets/catering_menu_card.dart';
 
 void main() {
   testWidgets('Welcome, Login, and Register screen flow',
@@ -179,5 +181,26 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Berhasil Ditambahkan'), findsNothing);
+  });
+
+  testWidgets('CateringMenuCard renders Image for menus with imageAsset',
+      (WidgetTester tester) async {
+    final ayamBakar = SampleData.menuItems.firstWhere((m) => m.id == 'm1');
+    expect(ayamBakar.imageAsset, isNotNull);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: CateringMenuCard(
+            menu: ayamBakar,
+            onTap: () {},
+            onAddToCart: () {},
+          ),
+        ),
+      ),
+    );
+
+    expect(find.byType(Image), findsOneWidget);
+    expect(find.text('Nasi Kotak Ayam Bakar Madu'), findsOneWidget);
   });
 }
