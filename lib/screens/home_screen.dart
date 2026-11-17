@@ -4,6 +4,7 @@ import '../theme/theme.dart';
 import '../widgets/add_to_cart_dialog.dart';
 import '../widgets/catering_menu_card.dart';
 import '../widgets/liquid_glass_app_bar_components.dart';
+import '../widgets/promo_carousel_banner.dart';
 import 'menu_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -17,6 +18,13 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final CateringService _cateringService = CateringService();
+
+  static const _homeCategories = [
+    (id: 'nasi_kotak', title: 'Nasi Kotak', emoji: '🍱'),
+    (id: 'prasmanan', title: 'Prasmanan', emoji: '🍲'),
+    (id: 'snack_box', title: 'Snack Box', emoji: '🧁'),
+    (id: 'tumpeng', title: 'Tumpeng', emoji: '🍚'),
+  ];
 
   @override
   void initState() {
@@ -32,6 +40,49 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _onServiceChanged() {
     if (mounted) setState(() {});
+  }
+
+  List<PromoItemData> _buildPromoItems() {
+    final menusById = {for (final m in _cateringService.menus) m.id: m};
+    final ayamBakar = menusById['m1'];
+    final liwet = menusById['m2'];
+    final rendang = menusById['m3'];
+    final nasiKuning = menusById['m6'];
+
+    return [
+      if (ayamBakar != null)
+        PromoItemData(
+          menu: ayamBakar,
+          headline: 'Promo Spesial Bulan Ini',
+          highlight: 'Ayam Bakar Madu',
+          subtitle: 'Ayam bumbu madu legit dengan tahu tempe & urap',
+          termsText: '*Min. order 10 box. Berlaku selama persediaan ada.',
+        ),
+      if (liwet != null)
+        PromoItemData(
+          menu: liwet,
+          headline: 'Khas Nusantara',
+          highlight: 'Nasi Liwet Solo',
+          subtitle: 'Suwiran ayam opor lembut & areh santan kental',
+          termsText: '*Tersedia setiap hari. Diskon 10% paket kantor.',
+        ),
+      if (rendang != null)
+        PromoItemData(
+          menu: rendang,
+          headline: 'Resep Asli Minang',
+          highlight: 'Nasi Box Rendang',
+          subtitle: 'Daging sapi rempah Minang empuk dengan gulai daun singkong',
+          termsText: '*Paling disukai untuk rapat dinas & makan siang.',
+        ),
+      if (nasiKuning != null)
+        PromoItemData(
+          menu: nasiKuning,
+          headline: 'Paket Tumpeng Mini',
+          highlight: 'Nasi Kuning Syukuran',
+          subtitle: '6 macam lauk pauk khas syukuran kemasan mika tebal',
+          termsText: '*Pilihan utama syukuran & perayaan keluarga.',
+        ),
+    ];
   }
 
   @override
@@ -97,7 +148,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const LiquidGlassCartButton(),
+                  const LiquidGlassThemeToggleButton(),
                 ],
               ),
             ),
@@ -142,9 +193,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           vertical: 10,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.cream,
+                          color: theme.colorScheme.surface,
                           borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: AppColors.border),
+                          border: Border.all(
+                            color: theme.colorScheme.outlineVariant,
+                          ),
                         ),
                         child: Row(
                           children: [
@@ -158,19 +211,19 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
+                                  Text(
                                     'Kirim Katering ke:',
                                     style: TextStyle(
                                       fontSize: 11,
-                                      color: AppColors.textSecondary,
+                                      color: theme.colorScheme.onSurfaceVariant,
                                     ),
                                   ),
                                   Text(
                                     _cateringService.currentAddress,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w600,
-                                      color: AppColors.textPrimary,
+                                      color: theme.colorScheme.onSurface,
                                     ),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
@@ -178,85 +231,18 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ],
                               ),
                             ),
-                            const Icon(
+                            Icon(
                               Icons.keyboard_arrow_down,
                               size: 20,
-                              color: AppColors.textSecondary,
+                              color: theme.colorScheme.onSurfaceVariant,
                             ),
                           ],
                         ),
                       ),
                       const SizedBox(height: 16),
 
-                      // Banner Promosi (BRD-3)
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [AppColors.forestGreen, Color(0xFF246C3B)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: AppColors.sunshine,
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: const Text(
-                                'PROMO BULAN INI',
-                                style: TextStyle(
-                                  color: AppColors.textPrimary,
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 10,
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            const Text(
-                              'Diskon 10% Paket Nasi Kotak',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            const Text(
-                              'Untuk pemesanan gathering kantor & syukuran mulai dari 30 box.',
-                              style: TextStyle(
-                                color: Colors.white70,
-                                fontSize: 12,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.crispCarrot,
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 8,
-                                ),
-                                minimumSize: const Size(0, 36),
-                              ),
-                              onPressed: () {
-                                widget.onNavigateTab?.call(1); // Go to menu tab
-                              },
-                              child: const Text('Lihat Menu Sekarang'),
-                            ),
-                          ],
-                        ),
-                      ),
+                      // Banner Promosi Bergaya Hero Carousel
+                      PromoCarouselBanner(promoItems: _buildPromoItems()),
                       const SizedBox(height: 24),
 
                       // Pilihan Kategori Katering (BRD-2)
@@ -280,45 +266,18 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(height: 8),
                       Row(
                         children: [
-                          _buildCategoryTile(
-                            context,
-                            title: 'Nasi Kotak',
-                            emoji: '🍱',
-                            onTap: () {
-                              _cateringService.selectCategory('nasi_kotak');
-                              widget.onNavigateTab?.call(1);
-                            },
-                          ),
-                          const SizedBox(width: 8),
-                          _buildCategoryTile(
-                            context,
-                            title: 'Prasmanan',
-                            emoji: '🍲',
-                            onTap: () {
-                              _cateringService.selectCategory('prasmanan');
-                              widget.onNavigateTab?.call(1);
-                            },
-                          ),
-                          const SizedBox(width: 8),
-                          _buildCategoryTile(
-                            context,
-                            title: 'Snack Box',
-                            emoji: '🧁',
-                            onTap: () {
-                              _cateringService.selectCategory('snack_box');
-                              widget.onNavigateTab?.call(1);
-                            },
-                          ),
-                          const SizedBox(width: 8),
-                          _buildCategoryTile(
-                            context,
-                            title: 'Tumpeng',
-                            emoji: '🍚',
-                            onTap: () {
-                              _cateringService.selectCategory('tumpeng');
-                              widget.onNavigateTab?.call(1);
-                            },
-                          ),
+                          for (final (i, category) in _homeCategories.indexed) ...[
+                            if (i > 0) const SizedBox(width: 8),
+                            _buildCategoryTile(
+                              context,
+                              title: category.title,
+                              emoji: category.emoji,
+                              onTap: () {
+                                _cateringService.selectCategory(category.id);
+                                widget.onNavigateTab?.call(1);
+                              },
+                            ),
+                          ],
                         ],
                       ),
                       const SizedBox(height: 24),
@@ -359,6 +318,7 @@ class _HomeScreenState extends State<HomeScreen> {
     required String emoji,
     required VoidCallback onTap,
   }) {
+    final theme = Theme.of(context);
     return Expanded(
       child: InkWell(
         onTap: onTap,
@@ -366,9 +326,11 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: theme.brightness == Brightness.dark
+                ? theme.colorScheme.surface
+                : Colors.white,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: theme.colorScheme.outlineVariant),
           ),
           child: Column(
             children: [
@@ -376,10 +338,10 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 6),
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
+                  color: theme.colorScheme.onSurface,
                 ),
                 textAlign: TextAlign.center,
                 maxLines: 1,

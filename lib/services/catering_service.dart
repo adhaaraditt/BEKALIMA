@@ -96,6 +96,9 @@ class CateringService extends ChangeNotifier {
   List<OrderItem> get orders => List.unmodifiable(_orders);
 
   void _initSampleOrders() {
+    final ayamBakar = SampleData.menuItems.firstWhere((m) => m.id == 'm1');
+    final nasiKuning = SampleData.menuItems.firstWhere((m) => m.id == 'm6');
+
     _orders.add(
       OrderItem(
         id: 'BKL-20261025-01',
@@ -109,12 +112,12 @@ class CateringService extends ChangeNotifier {
         status: OrderStatus.waitingPayment,
         items: [
           CartItem(
-            menu: SampleData.menuItems[0],
+            menu: ayamBakar,
             quantity: 25,
             specialNote: 'Mohon pisahkan sambalnya dalam wadah khusus.',
           ),
         ],
-        totalPrice: SampleData.menuItems[0].price * 25,
+        totalPrice: ayamBakar.price * 25,
         notes: 'Pintu gerbang hitam samping pos satpam.',
       ),
     );
@@ -132,11 +135,11 @@ class CateringService extends ChangeNotifier {
         status: OrderStatus.completed,
         items: [
           CartItem(
-            menu: SampleData.menuItems[5],
+            menu: nasiKuning,
             quantity: 15,
           ),
         ],
-        totalPrice: SampleData.menuItems[5].price * 15,
+        totalPrice: nasiKuning.price * 15,
         notes: 'Acara syukuran keluarga.',
         review: SampleData.initialReviews[2],
       ),

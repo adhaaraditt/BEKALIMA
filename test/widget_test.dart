@@ -5,6 +5,7 @@ import 'package:bekalima/main.dart';
 import 'package:bekalima/data/sample_data.dart';
 import 'package:bekalima/widgets/add_to_cart_dialog.dart';
 import 'package:bekalima/widgets/catering_menu_card.dart';
+import 'package:bekalima/widgets/promo_carousel_banner.dart';
 
 void main() {
   testWidgets('Welcome, Login, and Register screen flow',
@@ -202,5 +203,58 @@ void main() {
 
     expect(find.byType(Image), findsOneWidget);
     expect(find.text('Nasi Kotak Ayam Bakar Madu'), findsOneWidget);
+  });
+
+  testWidgets('PromoCarouselBanner renders headline, highlight, and Shop Now button',
+      (WidgetTester tester) async {
+    final ayamBakar = SampleData.menuItems.firstWhere((m) => m.id == 'm1');
+    final promo = PromoItemData(
+      menu: ayamBakar,
+      headline: 'Promo Spesial Bulan Ini',
+      highlight: 'Ayam Bakar Madu',
+      subtitle: 'Ayam bumbu madu legit dengan tahu tempe & urap',
+      termsText: '*Min. order 10 box.',
+      ctaText: 'Shop Now',
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: PromoCarouselBanner(
+            promoItems: [promo],
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('PROMO SPESIAL BULAN INI'), findsOneWidget);
+    expect(find.text('AYAM BAKAR MADU'), findsOneWidget);
+    expect(find.text('Shop Now'), findsOneWidget);
+    expect(find.byKey(const ValueKey('promo_cta_button_m1')), findsOneWidget);
+  });
+
+  testWidgets('PromoCarouselBanner shows both arrows when there are multiple promos',
+      (WidgetTester tester) async {
+    final ayamBakar = SampleData.menuItems.firstWhere((m) => m.id == 'm1');
+    PromoItemData promo(String highlight) => PromoItemData(
+          menu: ayamBakar,
+          headline: 'Promo',
+          highlight: highlight,
+          subtitle: 'Sub',
+          termsText: 'Terms',
+        );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: PromoCarouselBanner(
+            promoItems: [promo('Satu'), promo('Dua')],
+          ),
+        ),
+      ),
+    );
+
+    expect(find.byIcon(Icons.chevron_left_rounded), findsOneWidget);
+    expect(find.byIcon(Icons.chevron_right_rounded), findsOneWidget);
   });
 }

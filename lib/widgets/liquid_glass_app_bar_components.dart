@@ -1,8 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import '../screens/cart_screen.dart';
 import '../screens/notifications_screen.dart';
-import '../services/catering_service.dart';
 import '../services/theme_controller.dart';
 import '../theme/app_colors.dart';
 import '../theme/glass_palette.dart';
@@ -238,72 +236,6 @@ class LiquidGlassThemeToggleButton extends StatelessWidget {
             isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
             color: isDark ? AppColors.sunshine : AppColors.textPrimary,
             size: 22,
-          ),
-        );
-      },
-    );
-  }
-}
-
-/// Tombol keranjang belanja dengan gaya liquid glass dan badge jumlah item
-class LiquidGlassCartButton extends StatelessWidget {
-  const LiquidGlassCartButton({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final cateringService = CateringService();
-
-    return ListenableBuilder(
-      listenable: cateringService,
-      builder: (context, _) {
-        final count = cateringService.cartItemCount;
-
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(22),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                borderRadius: BorderRadius.circular(22),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const CartScreen()),
-                  );
-                },
-                child: Container(
-                  width: 42,
-                  height: 42,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    gradient: _glassGradient(context),
-                    borderRadius: BorderRadius.circular(22),
-                    border: Border.all(
-                      color: _glassBorder(context),
-                      width: 1.2,
-                    ),
-                    boxShadow: _glassShadows(context),
-                  ),
-                  child: Badge(
-                    isLabelVisible: count > 0,
-                    label: Text(
-                      '$count',
-                      style: const TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    backgroundColor: AppColors.crispCarrot,
-                    child: Icon(
-                      Icons.shopping_bag_outlined,
-                      color: Theme.of(context).colorScheme.onSurface,
-                      size: 20,
-                    ),
-                  ),
-                ),
-              ),
-            ),
           ),
         );
       },
