@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'app_colors.dart';
 
-/// Warna permukaan liquid glass yang ikut diinterpolasi oleh `AnimatedTheme`
-/// milik [MaterialApp]. Dengan begitu mode terang dan gelap tidak lagi
-/// berganti mendadak di tengah animasi seperti saat membaca `brightness`.
+/// milik [MaterialApp]. 
+
 @immutable
 class GlassPalette extends ThemeExtension<GlassPalette> {
   final Color gradientStart;

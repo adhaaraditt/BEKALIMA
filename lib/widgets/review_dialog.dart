@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 
-/// Pop-up ulasan yang tampil di tengah layar.
 class ReviewDialog extends StatefulWidget {
   const ReviewDialog({super.key});
 
-  /// Mengembalikan rating & komentar, atau null bila dialog dibatalkan.
   static Future<({double rating, String comment})?> show(
     BuildContext context,
   ) {

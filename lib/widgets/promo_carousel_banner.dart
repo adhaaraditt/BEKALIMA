@@ -115,7 +115,6 @@ class _PromoCarouselBannerState extends State<PromoCarouselBanner> {
             },
           ),
 
-          // Tombol panah kiri & kanan
           if (widget.promoItems.length > 1) ...[
             Positioned(
               left: 10,
@@ -147,7 +146,6 @@ class _PromoCarouselBannerState extends State<PromoCarouselBanner> {
             ),
           ],
 
-          // Indikator Titik Halaman di Bawah
           if (widget.promoItems.length > 1)
             Positioned(
               bottom: 14,
@@ -224,7 +222,6 @@ class _PromoCarouselBannerState extends State<PromoCarouselBanner> {
     return Stack(
       fit: StackFit.expand,
       children: [
-        // Gambar makanan transparan diletakkan di latar putih / surface
         if (imagePath != null)
           Positioned(
             top: 0,
@@ -251,7 +248,6 @@ class _PromoCarouselBannerState extends State<PromoCarouselBanner> {
             ),
           ),
 
-        // Gradien halus menyesuaikan warna kartu/latar untuk keterbacaan teks
         Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -268,7 +264,6 @@ class _PromoCarouselBannerState extends State<PromoCarouselBanner> {
           ),
         ),
 
-        // Konten teks promosi & tombol Shop Now di bagian bawah
         Positioned(
           left: 20,
           right: 20,
@@ -291,7 +286,6 @@ class _PromoCarouselBannerState extends State<PromoCarouselBanner> {
               ),
               const SizedBox(height: 2),
 
-              // Headline utama produk
               Text(
                 promo.highlight.toUpperCase(),
                 textAlign: TextAlign.center,
@@ -306,7 +300,6 @@ class _PromoCarouselBannerState extends State<PromoCarouselBanner> {
               ),
               const SizedBox(height: 5),
 
-              // Subtitle
               Text(
                 promo.subtitle,
                 textAlign: TextAlign.center,
@@ -323,7 +316,6 @@ class _PromoCarouselBannerState extends State<PromoCarouselBanner> {
               ),
               const SizedBox(height: 5),
 
-              // Syarat & Ketentuan ringkas
               Text(
                 promo.termsText,
                 textAlign: TextAlign.center,
@@ -335,7 +327,6 @@ class _PromoCarouselBannerState extends State<PromoCarouselBanner> {
               ),
               const SizedBox(height: 14),
 
-              // Tombol "Shop Now" dengan kontras tinggi
               ElevatedButton(
                 key: ValueKey('promo_cta_button_${promo.menu.id}'),
                 onPressed: () {

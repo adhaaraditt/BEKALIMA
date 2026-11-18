@@ -175,8 +175,6 @@ class _BekalimaAppState extends State<BekalimaApp>
   }
 }
 
-/// Memotong potret tema lama dengan lubang lingkaran yang terus membesar,
-/// sehingga tema baru di bawahnya terlihat "melebar" dari titik tombol.
 class _RevealHoleClipper extends CustomClipper<Path> {
   final Offset center;
   final double radius;

@@ -360,4 +360,3 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (_showFieldErrors) setState(() {});
   }
 }
- 

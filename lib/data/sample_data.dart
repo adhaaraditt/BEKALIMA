@@ -139,7 +139,7 @@ abstract final class SampleData {
       menuId: 'm6',
       userName: 'Rina Anggraeni',
       rating: 5.0,
-      comment: 'Tumpeng mini buat ulang tahun anak sangat cantik! Semua tamu memuji rasanya, porsi mengenyangkan.',
+       comment: 'Tumpeng mini buat ulang tahun anak sangat cantik! Semua tamu memuji rasanya, porsi mengenyangkan.',
       date: DateTime.now().subtract(const Duration(days: 6)),
     ),
   ];
