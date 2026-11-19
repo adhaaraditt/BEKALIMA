@@ -81,6 +81,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
+  void _handleGoogleRegister() {
+    _cateringService.login(usernameOrEmail: 'User Google');
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Berhasil mendaftar menggunakan Google'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+
+    Navigator.of(context).pushAndRemoveUntil(
+      PageRouteBuilder(
+        transitionDuration: const Duration(milliseconds: 350),
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const MainNavigationScreen(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+      ),
+      (route) => false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     const brandOrange = Color(0xFFFA5805);
@@ -320,6 +343,95 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             fontSize: 16,
                             fontWeight: FontWeight.w900,
                           ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // Garis Pembatas 'Atau'
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            height: 1,
+                            color: const Color(0xFFCCCCCC),
+                          ),
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 16),
+                          child: Text(
+                            'Atau',
+                            style: TextStyle(
+                              fontFamily: 'Plus Jakarta Sans',
+                              color: Color(0xFF888888),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Container(
+                            height: 1,
+                            color: const Color(0xFFCCCCCC),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 22),
+
+                    // Tombol Continue With Google
+                    SizedBox(
+                      width: double.infinity,
+                      height: 52,
+                      child: ElevatedButton(
+                        onPressed: _handleGoogleRegister,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.black,
+                          foregroundColor: Colors.white,
+                          elevation: 3,
+                          shadowColor: Colors.black.withValues(alpha: 0.3),
+                          padding: const EdgeInsets.symmetric(horizontal: 18),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(26),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 28,
+                              height: 28,
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.white,
+                              ),
+                              alignment: Alignment.center,
+                              child: Image.asset(
+                                'assets/images/google_logo.png',
+                                width: 18,
+                                height: 18,
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                            const SizedBox(width: 14),
+                            const Expanded(
+                              child: Text(
+                                'Continue With Google',
+                                style: TextStyle(
+                                  fontFamily: 'Plus Jakarta Sans',
+                                  fontSize: 14.5,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                            const Icon(
+                              Icons.arrow_forward_rounded,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                          ],
                         ),
                       ),
                     ),

@@ -85,6 +85,119 @@ class _HomeScreenState extends State<HomeScreen> {
     ];
   }
 
+  void _showAddressPicker() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 16, 12, 8),
+              child: Row(
+                children: [
+                  const Expanded(
+                    child: Text(
+                      'Pilih Alamat Pengiriman',
+                      style: TextStyle(
+                        fontFamily: 'Plus Jakarta Sans',
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF111111),
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _showAddAddressDialog();
+                    },
+                    icon: const Icon(Icons.add_circle, size: 28),
+                    color: AppColors.crispCarrot,
+                    tooltip: 'Tambah alamat',
+                  ),
+                ],
+              ),
+            ),
+            ...List.generate(_cateringService.savedAddresses.length, (index) {
+              final isSelected =
+                  index == _cateringService.selectedAddressIndex;
+              return ListTile(
+                leading: Icon(
+                  isSelected
+                      ? Icons.check_circle
+                      : Icons.radio_button_unchecked,
+                  color: isSelected
+                      ? AppColors.forestGreen
+                      : AppColors.textDisabled,
+                ),
+                title: Text(
+                  _cateringService.savedAddresses[index],
+                  style: TextStyle(
+                    fontFamily: 'Plus Jakarta Sans',
+                    fontWeight:
+                        isSelected ? FontWeight.w600 : FontWeight.w400,
+                  ),
+                ),
+                onTap: () {
+                  _cateringService.selectAddress(index);
+                  Navigator.pop(context);
+                },
+              );
+            }),
+            const SizedBox(height: 12),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showAddAddressDialog() {
+    final addressCtrl = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Tambah Alamat Pengiriman'),
+        content: TextField(
+          controller: addressCtrl,
+          maxLines: 3,
+          decoration: const InputDecoration(
+            hintText: 'Nama gedung / jalan, nomor, lantai, patokan...',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Batal'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final address = addressCtrl.text.trim();
+              if (address.isEmpty) return;
+              final newIndex = _cateringService.savedAddresses.length;
+              _cateringService.addAddress(address);
+              _cateringService.selectAddress(newIndex);
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  backgroundColor: AppColors.forestGreen,
+                  content: Text('Alamat baru berhasil ditambahkan.'),
+                ),
+              );
+            },
+            child: const Text('Tambah'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -187,65 +300,67 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Lokasi Pengiriman Pengguna
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 10,
-                        ),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.surface,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: theme.colorScheme.outlineVariant,
+                      GestureDetector(
+                        onTap: _showAddressPicker,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 10,
                           ),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.location_on,
-                              color: AppColors.crispCarrot,
-                              size: 20,
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surface,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: theme.colorScheme.outlineVariant,
                             ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Kirim Katering ke:',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      color: theme.colorScheme.onSurfaceVariant,
-                                    ),
-                                  ),
-                                  Text(
-                                    _cateringService.currentAddress,
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w600,
-                                      color: theme.colorScheme.onSurface,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ],
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.location_on,
+                                color: AppColors.crispCarrot,
+                                size: 20,
                               ),
-                            ),
-                            Icon(
-                              Icons.keyboard_arrow_down,
-                              size: 20,
-                              color: theme.colorScheme.onSurfaceVariant,
-                            ),
-                          ],
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Alamatmu',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color:
+                                            theme.colorScheme.onSurfaceVariant,
+                                      ),
+                                    ),
+                                    Text(
+                                      _cateringService.currentAddress,
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                        color: theme.colorScheme.onSurface,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Icon(
+                                Icons.keyboard_arrow_down,
+                                size: 20,
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                       const SizedBox(height: 16),
 
-                      // Banner Promosi Bergaya Hero Carousel
                       PromoCarouselBanner(promoItems: _buildPromoItems()),
                       const SizedBox(height: 24),
 
-                      // Pilihan Kategori Katering (BRD-2)
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -282,7 +397,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 24),
 
-                      // Menu Unggulan & Rekomendasi (BRD-1)
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
