@@ -18,14 +18,12 @@ void main() {
     await tester.pumpWidget(const BekalimaApp());
     await tester.pump(const Duration(milliseconds: 100));
 
-    // 1. Verifikasi Welcome Screen
     expect(find.text('BEKALIMA'), findsOneWidget);
     expect(find.text('Healty Food Catering'), findsOneWidget);
 
     final arrowFinder = find.byKey(const ValueKey('welcome_arrow_button'));
     expect(arrowFinder, findsOneWidget);
 
-    // Buka Bottom Sheet Selamat Datang
     await tester.tap(arrowFinder);
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
@@ -34,24 +32,20 @@ void main() {
     expect(find.byKey(const ValueKey('welcome_masuk_button')), findsOneWidget);
     expect(find.byKey(const ValueKey('welcome_daftar_button')), findsOneWidget);
 
-    // 2. Navigasi ke Halaman Masuk (Login)
     await tester.tap(find.byKey(const ValueKey('welcome_masuk_button')));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
 
-    // Verifikasi elemen halaman Masuk sesuai desain
     expect(find.text('Silahkan Masuk akun apabila sudah mempunyai akun'), findsOneWidget);
     expect(find.text('Username/Email'), findsOneWidget);
     expect(find.text('Lupa Password?'), findsOneWidget);
     expect(find.text('Continue With Google'), findsOneWidget);
     expect(find.text('Continue With Facebook'), findsOneWidget);
 
-    // 3. Pindah ke Halaman Daftar dari link header atas
     await tester.tap(find.text('Daftar').first);
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
 
-    // Verifikasi elemen halaman Daftar sesuai desain
     expect(find.text('Silahkan membuat akun terlebih dahulu'), findsOneWidget);
     expect(find.text('Email'), findsOneWidget);
     expect(find.text('Username'), findsOneWidget);
@@ -64,13 +58,11 @@ void main() {
       findsOneWidget,
     );
 
-    // 4. Submit kosong: tampilkan pesan wajib isi
     await tester.tap(find.byKey(const ValueKey('submit_register_button')));
     await tester.pump();
 
     expect(find.text('Harap di isi terlebih dahulu.'), findsNWidgets(5));
 
-    // Isi semua field lalu submit
     await tester.enterText(find.byType(TextField).at(0), 'raditya@bekalima.com');
     await tester.enterText(find.byType(TextField).at(1), 'raditya');
     await tester.enterText(find.byType(TextField).at(2), '081234567890');
@@ -80,7 +72,6 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('submit_register_button')));
     await tester.pump();
 
-    // Password lemah ditolak
     expect(
       find.text(
         'Password minimal 8 karakter, harus ada huruf besar, angka, dan simbol.',
@@ -89,7 +80,6 @@ void main() {
     );
     expect(find.text('Katering Online Indonesia'), findsNothing);
 
-    // Isi password kuat lalu submit
     await tester.enterText(find.byType(TextField).at(3), 'Bekalima123!');
     await tester.enterText(find.byType(TextField).at(4), 'Bekalima123!');
 
@@ -97,20 +87,15 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
 
-    // Verifikasi masuk ke layar utama katering
     expect(find.text('Katering Online Indonesia'), findsOneWidget);
     expect(find.text('Kategori Katering'), findsOneWidget);
-
-    // 5. Verifikasi Bottom Navigation Bar: hanya tab aktif yang menampilkan label
     expect(find.text('Beranda'), findsOneWidget);
 
-    // Verifikasi sliding indicator awal berada di tab pertama (-1.0)
     final initialIndicator = tester.widget<AnimatedAlign>(
       find.byType(AnimatedAlign),
     );
     expect(initialIndicator.alignment, equals(const Alignment(-1.0, 0.0)));
 
-    // Tab lain yang belum aktif hanya menampilkan ikonnya
     final menuCrossFade = tester.widget<AnimatedCrossFade>(
       find.byWidgetPredicate((widget) =>
           widget is AnimatedCrossFade &&
@@ -120,12 +105,10 @@ void main() {
     );
     expect(menuCrossFade.crossFadeState, equals(CrossFadeState.showSecond));
 
-    // Ketuk tab Menu
     await tester.tap(find.byIcon(Icons.restaurant_menu_outlined));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
 
-    // Sekarang tab Menu menampilkan labelnya dan sliding indicator bergeser ke tab Menu
     final updatedIndicator = tester.widget<AnimatedAlign>(
       find.byType(AnimatedAlign),
     );
@@ -164,11 +147,9 @@ void main() {
       ),
     );
 
-    // Buka dialog
     await tester.tap(find.text('Add'));
     await tester.pumpAndSettle();
 
-    // Verifikasi konten dialog di tengah layar
     expect(find.text('Berhasil Ditambahkan'), findsOneWidget);
     expect(
       find.text('Berhasil menambahkan 5 porsi Nasi Liwet Komplit ke keranjang.'),
@@ -177,7 +158,6 @@ void main() {
     expect(find.byKey(const ValueKey('dialog_close_button')), findsOneWidget);
     expect(find.byKey(const ValueKey('dialog_view_cart_button')), findsOneWidget);
 
-    // Ketuk tombol X untuk menutup
     await tester.tap(find.byKey(const ValueKey('dialog_close_button')));
     await tester.pumpAndSettle();
 

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
-/// Skala tipografi BEKALIMA sesuai DESIGN.md
-/// Mengedepankan keterbacaan tinggi di layar mobile dan nuansa kuliner yang hangat & rapi.
 abstract final class AppTypography {
   static const TextStyle displayLarge = TextStyle(
     fontSize: 26,

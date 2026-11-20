@@ -23,7 +23,7 @@ class OrderItem {
   final String paymentMethod;
   OrderStatus status;
   final List<CartItem> items;
-  final int totalPrice;
+  int totalPrice;
   final String? notes;
   ReviewItem? review;
 
@@ -44,5 +44,6 @@ class OrderItem {
   });
 
   bool get canBeCancelled => status == OrderStatus.waitingPayment;
+  bool get canBeEdited => status == OrderStatus.waitingPayment;
   bool get canBeReviewed => status == OrderStatus.completed && review == null;
 }

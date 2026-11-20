@@ -272,7 +272,6 @@ class _PromoCarouselBannerState extends State<PromoCarouselBanner> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Headline atas
               Text(
                 promo.headline.toUpperCase(),
                 textAlign: TextAlign.center,

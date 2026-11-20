@@ -6,7 +6,7 @@ import '../theme/app_colors.dart';
 import '../theme/app_typography.dart';
 import '../theme/glass_palette.dart';
 
-/// Item data model untuk [LiquidGlassNavigationBar]
+/// [LiquidGlassNavigationBar]
 class LiquidGlassNavItem {
   final IconData icon;
   final IconData activeIcon;
@@ -26,8 +26,6 @@ class LiquidGlassNavigationBar extends StatelessWidget {
   final List<LiquidGlassNavItem> items;
   final bool onlyShowSelectedLabel;
 
-  /// Aksi utama yang ditampilkan di tengah bar, di antara item navigasi.
-  /// Tidak ikut terpilih sebagai tab.
   final Widget? centerAction;
 
   const LiquidGlassNavigationBar({
@@ -46,8 +44,6 @@ class LiquidGlassNavigationBar extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final scheme = Theme.of(context).colorScheme;
     final palette = glassPaletteOf(context);
-
-    // Saat ada aksi tengah, bar punya satu slot ekstra di tengah.
     final centerSlot = items.length ~/ 2;
     final slotCount = items.length + (centerAction != null ? 1 : 0);
     final activeSlot = centerAction != null && currentIndex >= centerSlot
@@ -259,8 +255,6 @@ class LiquidGlassNavigationBar extends StatelessWidget {
   }
 }
 
-/// Tombol keranjang utama di tengah navigation bar, lengkap dengan badge
-/// jumlah item.
 class LiquidGlassCartNavAction extends StatelessWidget {
   const LiquidGlassCartNavAction({super.key});
 

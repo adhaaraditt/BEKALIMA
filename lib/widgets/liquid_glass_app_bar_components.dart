@@ -5,8 +5,6 @@ import '../services/theme_controller.dart';
 import '../theme/app_colors.dart';
 import '../theme/glass_palette.dart';
 
-/// Gradien kaca cair yang dipakai bersama oleh elemen header.
-/// Warna dibuat lebih pekat agar bulatan ikon/judul/keranjang lebih tegas.
 LinearGradient _glassGradient(BuildContext context) {
   final palette = glassPaletteOf(context);
 
@@ -17,7 +15,6 @@ LinearGradient _glassGradient(BuildContext context) {
   );
 }
 
-/// Bayangan halus agar elemen kaca tetap terpisah dari background.
 List<BoxShadow> _glassShadows(BuildContext context) {
   final palette = glassPaletteOf(context);
 
@@ -38,7 +35,6 @@ List<BoxShadow> _glassShadows(BuildContext context) {
 
 Color _glassBorder(BuildContext context) => glassPaletteOf(context).border;
 
-/// Baris header standar: ikon, judul, tombol tema, dan notifikasi.
 class LiquidGlassHeader extends StatelessWidget {
   final Widget leading;
   final Widget title;
@@ -75,7 +71,6 @@ class LiquidGlassHeader extends StatelessWidget {
   }
 }
 
-/// Tombol ikon dengan wadah kaca yang sama untuk tema dan notifikasi.
 class GlassIconButton extends StatelessWidget {
   final Widget child;
   final VoidCallback onTap;
@@ -121,7 +116,6 @@ class GlassIconButton extends StatelessWidget {
   }
 }
 
-/// Wadah liquid glass berbentuk kapsul (kotak membulat) untuk judul header.
 class LiquidGlassCapsule extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry padding;
@@ -157,7 +151,7 @@ class LiquidGlassCapsule extends StatelessWidget {
   }
 }
 
-/// Wadah liquid glass berbentuk lingkaran untuk ikon header.
+
 class LiquidGlassCircle extends StatelessWidget {
   final Widget child;
   final double size;
@@ -186,7 +180,6 @@ class LiquidGlassCircle extends StatelessWidget {
   }
 }
 
-/// Tombol notifikasi bergaya liquid glass untuk header.
 class LiquidGlassNotificationButton extends StatelessWidget {
   const LiquidGlassNotificationButton({super.key});
 
@@ -208,7 +201,6 @@ class LiquidGlassNotificationButton extends StatelessWidget {
   }
 }
 
-/// Tombol sekali ketuk untuk berpindah antara mode terang dan mode gelap.
 class LiquidGlassThemeToggleButton extends StatelessWidget {
   const LiquidGlassThemeToggleButton({super.key});
 

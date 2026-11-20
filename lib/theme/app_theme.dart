@@ -140,8 +140,6 @@ abstract final class AppTheme {
     );
   }
 
-  /// Varian gelap dari tema BEKALIMA. Latar memakai cokelat-hitam hangat,
-  /// bukan #000000, supaya foto & aksen kuliner tetap terasa natural.
   static ThemeData get darkTheme {
     final textTheme = TextTheme(
       displayLarge: AppTypography.displayLarge.copyWith(

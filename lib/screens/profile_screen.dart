@@ -180,13 +180,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  void _showAddAddressDialog() {
-    final addressCtrl = TextEditingController();
+  void _showAddressDialog({int? index}) {
+    final isEdit = index != null;
+    final addressCtrl = TextEditingController(
+      text: isEdit ? _cateringService.savedAddresses[index] : '',
+    );
 
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Tambah Alamat Pengiriman'),
+        title: Text(
+          isEdit ? 'Edit Alamat Pengiriman' : 'Tambah Alamat Pengiriman',
+        ),
         content: TextField(
           controller: addressCtrl,
           maxLines: 3,
@@ -201,18 +206,57 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           ElevatedButton(
             onPressed: () {
-              if (addressCtrl.text.trim().isNotEmpty) {
-                _cateringService.addAddress(addressCtrl.text.trim());
-                Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    backgroundColor: AppColors.forestGreen,
-                    content: Text('Alamat baru berhasil ditambahkan.'),
-                  ),
-                );
+              final address = addressCtrl.text.trim();
+              if (address.isEmpty) return;
+              if (isEdit) {
+                _cateringService.updateAddress(index, address);
+              } else {
+                _cateringService.addAddress(address);
               }
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  backgroundColor: AppColors.forestGreen,
+                  content: Text(
+                    isEdit
+                        ? 'Alamat berhasil diperbarui.'
+                        : 'Alamat baru berhasil ditambahkan.',
+                  ),
+                ),
+              );
             },
-            child: const Text('Tambah'),
+            child: Text(isEdit ? 'Simpan' : 'Tambah'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmDeleteAddress(int index) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Hapus Alamat'),
+        content: Text(
+          'Hapus alamat "${_cateringService.savedAddresses[index]}" dari daftar?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Batal'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.tomatoBurst,
+            ),
+            onPressed: () {
+              _cateringService.removeAddress(index);
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Alamat berhasil dihapus.')),
+              );
+            },
+            child: const Text('Hapus'),
           ),
         ],
       ),
@@ -247,7 +291,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
                 children: [
-                  // Kartu Informasi Akun
                   Card(
                     child: Padding(
                       padding: const EdgeInsets.all(16),
@@ -300,19 +343,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
-
-                  // Daftar Alamat Tersimpan (PRF-3)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Alamat Pengantaran Acara',
+                        'Alamat Pengantaran',
                         style: theme.textTheme.titleMedium,
                       ),
                       TextButton.icon(
                         icon: const Icon(Icons.add, size: 16),
                         label: const Text('Tambah'),
-                        onPressed: _showAddAddressDialog,
+                        onPressed: () => _showAddressDialog(),
                       ),
                     ],
                   ),
@@ -341,8 +382,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 : FontWeight.w400,
                           ),
                         ),
-                        trailing: isSelected
-                            ? Container(
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (isSelected)
+                              Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 8,
                                   vertical: 4,
@@ -359,8 +403,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     color: AppColors.forestGreen,
                                   ),
                                 ),
-                              )
-                            : null,
+                              ),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.edit_outlined,
+                                color: AppColors.crispCarrot,
+                              ),
+                              tooltip: 'Edit alamat',
+                              visualDensity: VisualDensity.compact,
+                              onPressed: () => _showAddressDialog(index: index),
+                            ),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.delete_outline,
+                                color: AppColors.tomatoBurst,
+                              ),
+                              tooltip: 'Hapus alamat',
+                              visualDensity: VisualDensity.compact,
+                              onPressed: () => _confirmDeleteAddress(index),
+                            ),
+                          ],
+                        ),
                         onTap: () {
                           _cateringService.selectAddress(index);
                         },
@@ -368,8 +431,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     );
                   }),
                   const SizedBox(height: 24),
-
-                  // Kebijakan & Informasi Katering
                   Text(
                     'Informasi Layanan BEKALIMA',
                     style: theme.textTheme.titleMedium,

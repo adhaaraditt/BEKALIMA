@@ -5,14 +5,14 @@ import '../models/category_item.dart';
 import '../models/menu_item.dart';
 import '../models/order_item.dart';
 import '../models/review_item.dart';
+import '../models/user_account.dart';
+import 'sheets_service.dart';
 
 class CateringService extends ChangeNotifier {
   static final CateringService _instance = CateringService._internal();
   factory CateringService() => _instance;
 
-  CateringService._internal() {
-    _initSampleOrders();
-  }
+  CateringService._internal();
 
   final List<CategoryItem> _categories = SampleData.categories;
   final List<MenuItem> _menus = List.from(SampleData.menuItems);
@@ -26,8 +26,11 @@ class CateringService extends ChangeNotifier {
 
   List<MenuItem> get filteredMenus {
     return _menus.where((item) {
-      final matchesCategory = _selectedCategoryId == 'all' || item.categoryId == _selectedCategoryId;
-      final matchesSearch = _searchQuery.trim().isEmpty ||
+      final matchesCategory =
+          _selectedCategoryId == 'all' ||
+          item.categoryId == _selectedCategoryId;
+      final matchesSearch =
+          _searchQuery.trim().isEmpty ||
           item.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
           item.description.toLowerCase().contains(_searchQuery.toLowerCase());
       return matchesCategory && matchesSearch;
@@ -48,23 +51,25 @@ class CateringService extends ChangeNotifier {
 
   List<CartItem> get cartItems => List.unmodifiable(_cartItems);
 
-  int get cartItemCount => _cartItems.fold(0, (sum, item) => sum + item.quantity);
+  int get cartItemCount =>
+      _cartItems.fold(0, (sum, item) => sum + item.quantity);
 
-  int get cartTotalPrice => _cartItems.fold(0, (sum, item) => sum + item.subtotal);
+  int get cartTotalPrice =>
+      _cartItems.fold(0, (sum, item) => sum + item.subtotal);
 
   void addToCart(MenuItem menu, int quantity, {String? note}) {
-    final existingIndex = _cartItems.indexWhere((item) => item.menu.id == menu.id);
+    final existingIndex = _cartItems.indexWhere(
+      (item) => item.menu.id == menu.id,
+    );
     if (existingIndex >= 0) {
       _cartItems[existingIndex].quantity += quantity;
       if (note != null && note.isNotEmpty) {
         _cartItems[existingIndex].specialNote = note;
       }
     } else {
-      _cartItems.add(CartItem(
-        menu: menu,
-        quantity: quantity,
-        specialNote: note,
-      ));
+      _cartItems.add(
+        CartItem(menu: menu, quantity: quantity, specialNote: note),
+      );
     }
     notifyListeners();
   }
@@ -91,78 +96,35 @@ class CateringService extends ChangeNotifier {
     notifyListeners();
   }
 
-  // --- Pesanan ---
-  final List<OrderItem> _orders = [];
-  List<OrderItem> get orders => List.unmodifiable(_orders);
+  final Map<String, List<OrderItem>> _ordersByUser = {};
+  String _orderOwnerKey = '';
+  int _orderSequence = 0;
 
-  void _initSampleOrders() {
-    final ayamBakar = SampleData.menuItems.firstWhere((m) => m.id == 'm1');
-    final nasiKuning = SampleData.menuItems.firstWhere((m) => m.id == 'm6');
-
-    _orders.add(
-      OrderItem(
-        id: 'BKL-20261025-01',
-        orderDate: DateTime.now().subtract(const Duration(days: 1)),
-        eventDate: '28 Oktober 2026',
-        eventTime: '11:30 WIB',
-        recipientName: 'Raditya Pratama',
-        recipientPhone: '081234567890',
-        deliveryAddress: 'Jl. Merpati No. 12, Kebayoran Baru, Jakarta Selatan',
-        paymentMethod: 'Transfer Virtual Account BCA',
-        status: OrderStatus.waitingPayment,
-        items: [
-          CartItem(
-            menu: ayamBakar,
-            quantity: 25,
-            specialNote: 'Mohon pisahkan sambalnya dalam wadah khusus.',
-          ),
-        ],
-        totalPrice: ayamBakar.price * 25,
-        notes: 'Pintu gerbang hitam samping pos satpam.',
-      ),
-    );
-
-    _orders.add(
-      OrderItem(
-        id: 'BKL-20261020-04',
-        orderDate: DateTime.now().subtract(const Duration(days: 6)),
-        eventDate: '21 Oktober 2026',
-        eventTime: '10:00 WIB',
-        recipientName: 'Raditya Pratama',
-        recipientPhone: '081234567890',
-        deliveryAddress: 'Jl. Merpati No. 12, Kebayoran Baru, Jakarta Selatan',
-        paymentMethod: 'QRIS Gopay',
-        status: OrderStatus.completed,
-        items: [
-          CartItem(
-            menu: nasiKuning,
-            quantity: 15,
-          ),
-        ],
-        totalPrice: nasiKuning.price * 15,
-        notes: 'Acara syukuran keluarga.',
-        review: SampleData.initialReviews[2],
-      ),
-    );
-  }
+  List<OrderItem> get orders =>
+      List.unmodifiable(_ordersByUser[_orderOwnerKey] ?? const <OrderItem>[]);
 
   OrderItem createOrder({
     required String recipientName,
     required String recipientPhone,
     required String deliveryAddress,
-    required String eventDate,
-    required String eventTime,
+    String? eventDate,
+    String? eventTime,
     required String paymentMethod,
     String? notes,
   }) {
     final now = DateTime.now();
-    final orderId = 'BKL-${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}-${(_orders.length + 1).toString().padLeft(3, '0')}';
+    final eta = now.add(const Duration(hours: 1));
+    final etaStr =
+        '${eta.hour.toString().padLeft(2, '0')}:${eta.minute.toString().padLeft(2, '0')} WIB';
+    final userOrders = _ordersByUser.putIfAbsent(_orderOwnerKey, () => []);
+    final orderId =
+        'BKL-${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}-${now.millisecondsSinceEpoch}${_orderSequence++}';
 
     final newOrder = OrderItem(
       id: orderId,
       orderDate: now,
-      eventDate: eventDate,
-      eventTime: eventTime,
+      eventDate: eventDate ?? 'Hari ini',
+      eventTime: eventTime ?? '1 Jam (estimasi tiba ~$etaStr)',
       recipientName: recipientName,
       recipientPhone: recipientPhone,
       deliveryAddress: deliveryAddress,
@@ -173,33 +135,113 @@ class CateringService extends ChangeNotifier {
       notes: notes,
     );
 
-    _orders.insert(0, newOrder);
+    userOrders.insert(0, newOrder);
     _cartItems.clear();
     notifyListeners();
+
+    SheetsService.instance.sendOrder(newOrder);
+
     return newOrder;
   }
 
   void cancelOrder(String orderId) {
-    final index = _orders.indexWhere((o) => o.id == orderId);
-    if (index >= 0 && _orders[index].canBeCancelled) {
-      _orders[index].status = OrderStatus.cancelled;
+    final userOrders = _ordersByUser[_orderOwnerKey];
+    if (userOrders == null) return;
+
+    final index = userOrders.indexWhere((o) => o.id == orderId);
+    if (index >= 0 && userOrders[index].canBeCancelled) {
+      userOrders[index].status = OrderStatus.cancelled;
       notifyListeners();
+      SheetsService.instance.updateOrderStatus(
+        orderId,
+        OrderStatus.cancelled.label,
+      );
     }
   }
 
-  /// Simulasi pembayaran berhasil: pesanan langsung selesai agar bisa diulas.
   void confirmPayment(String orderId) {
-    final index = _orders.indexWhere((o) => o.id == orderId);
+    final userOrders = _ordersByUser[_orderOwnerKey];
+    if (userOrders == null) return;
+
+    final index = userOrders.indexWhere((o) => o.id == orderId);
     if (index >= 0) {
-      _orders[index].status = OrderStatus.completed;
+      userOrders[index].status = OrderStatus.paid;
       notifyListeners();
+      SheetsService.instance.updateOrderStatus(orderId, OrderStatus.paid.label);
     }
+  }
+
+  OrderItem? _findOrder(String orderId) {
+    final userOrders = _ordersByUser[_orderOwnerKey];
+    if (userOrders == null) return null;
+
+    final index = userOrders.indexWhere((o) => o.id == orderId);
+    return index >= 0 ? userOrders[index] : null;
+  }
+
+  void updateOrderItemQuantity(String orderId, String menuId, int quantity) {
+    final order = _findOrder(orderId);
+    if (order == null || !order.canBeEdited) return;
+
+    final index = order.items.indexWhere((item) => item.menu.id == menuId);
+    if (index < 0) return;
+
+    if (quantity <= 0) {
+      if (order.items.length == 1) return;
+      order.items.removeAt(index);
+    } else {
+      order.items[index].quantity = quantity;
+    }
+    _saveOrderItems(order);
+  }
+
+  void addOrderItem(String orderId, MenuItem menu, {int quantity = 1}) {
+    final order = _findOrder(orderId);
+    if (order == null || !order.canBeEdited) return;
+
+    final index = order.items.indexWhere((item) => item.menu.id == menu.id);
+    if (index >= 0) {
+      order.items[index].quantity += quantity;
+    } else {
+      order.items.add(CartItem(menu: menu, quantity: quantity));
+    }
+    _saveOrderItems(order);
+  }
+
+  void _saveOrderItems(OrderItem order) {
+    order.totalPrice = order.items.fold(0, (sum, item) => sum + item.subtotal);
+    notifyListeners();
+    SheetsService.instance.updateOrderItems(order);
   }
 
   void reorder(OrderItem previousOrder) {
     for (final item in previousOrder.items) {
       addToCart(item.menu, item.quantity, note: item.specialNote);
     }
+  }
+
+  Future<void> syncOrderStatuses() async {
+    final statuses = await SheetsService.instance.fetchOrderStatuses();
+    if (statuses.isEmpty) return;
+
+    var changed = false;
+    for (final userOrders in _ordersByUser.values) {
+      for (final order in userOrders) {
+        final label = statuses[order.id];
+        if (label == null) continue;
+
+        final status = OrderStatus.values.firstWhere(
+          (value) => value.label == label,
+          orElse: () => order.status,
+        );
+        if (status != order.status) {
+          order.status = status;
+          changed = true;
+        }
+      }
+    }
+
+    if (changed) notifyListeners();
   }
 
   final List<ReviewItem> _reviews = List.from(SampleData.initialReviews);
@@ -227,19 +269,32 @@ class CateringService extends ChangeNotifier {
 
     _reviews.insert(0, newReview);
 
-    // Tandai pesanan sebagai sudah diulas
-    final orderIndex = _orders.indexWhere((o) => o.id == orderId);
+    final userOrders = _ordersByUser[_orderOwnerKey];
+    final orderIndex = userOrders?.indexWhere((o) => o.id == orderId) ?? -1;
     if (orderIndex >= 0) {
-      _orders[orderIndex].review = newReview;
+      userOrders![orderIndex].review = newReview;
     }
 
     notifyListeners();
   }
 
-  String userName = 'Raditya Pratama';
-  String userEmail = 'raditya@bekalima.com';
-  String userPhone = '0812-3456-7890';
-  String password = 'bekalima123';
+  String userName = '';
+  String userEmail = '';
+  String userPhone = '';
+  String password = '';
+  bool isLoggedIn = false;
+  final List<UserAccount> _registeredUsers = [];
+
+  List<UserAccount> get registeredUsers => List.unmodifiable(_registeredUsers);
+
+  bool isUserRegistered(String usernameOrEmail) {
+    final query = usernameOrEmail.trim().toLowerCase();
+    return _registeredUsers.any(
+      (u) =>
+          u.username.toLowerCase() == query || u.email.toLowerCase() == query,
+    );
+  }
+
   List<String> savedAddresses = [
     'Jl. Merpati No. 12, Kebayoran Baru, Jakarta Selatan (Rumah)',
     'Gedung Cyber 2 Tower Lt. 15, Jl. H.R. Rasuna Said, Kuningan (Kantor)',
@@ -250,14 +305,17 @@ class CateringService extends ChangeNotifier {
       ? savedAddresses[selectedAddressIndex]
       : 'Belum ada alamat tersimpan';
 
-  void updateProfile({required String name, required String phone, required String email}) {
+  void updateProfile({
+    required String name,
+    required String phone,
+    required String email,
+  }) {
     userName = name;
     userPhone = phone;
     userEmail = email;
     notifyListeners();
   }
 
-  /// Mengembalikan pesan error, atau null kalau password berhasil diganti.
   String? changePassword({
     required String currentPassword,
     required String newPassword,
@@ -273,27 +331,104 @@ class CateringService extends ChangeNotifier {
     return null;
   }
 
-  void login({required String usernameOrEmail}) {
-    if (usernameOrEmail.trim().isNotEmpty) {
-      if (usernameOrEmail.contains('@')) {
-        userEmail = usernameOrEmail.trim();
-        userName = usernameOrEmail.split('@').first;
-      } else {
-        userName = usernameOrEmail.trim();
-      }
-      notifyListeners();
+  Future<bool> login({
+    required String usernameOrEmail,
+    String? password,
+  }) async {
+    final query = usernameOrEmail.trim().toLowerCase();
+
+    UserAccount? user = _registeredUsers.cast<UserAccount?>().firstWhere((u) {
+      final matchesIdentity =
+          u!.username.toLowerCase() == query || u.email.toLowerCase() == query;
+      if (password == null) return matchesIdentity;
+      return matchesIdentity && u.password == password;
+    }, orElse: () => null);
+
+    if (user == null && password != null) {
+      user = await SheetsService.instance.loginUser(
+        usernameOrEmail: usernameOrEmail,
+        password: password,
+      );
     }
+
+    if (user == null) {
+      return false;
+    }
+
+    userName = user.name;
+    userEmail = user.email;
+    userPhone = user.phone;
+    this.password = user.password;
+    _orderOwnerKey = user.username.trim().toLowerCase();
+    isLoggedIn = true;
+    notifyListeners();
+    return true;
   }
 
-  void register({required String email, required String username, required String phone}) {
-    if (username.trim().isNotEmpty) userName = username.trim();
-    if (email.trim().isNotEmpty) userEmail = email.trim();
-    if (phone.trim().isNotEmpty) userPhone = phone.trim();
+  bool register({
+    required String email,
+    required String username,
+    required String phone,
+    String password = '',
+  }) {
+    final cleanUsername = username.trim();
+    final cleanEmail = email.trim();
+    final cleanPhone = phone.trim();
+
+    if (isUserRegistered(cleanUsername) || isUserRegistered(cleanEmail)) {
+      return false;
+    }
+
+    final newUser = UserAccount(
+      username: cleanUsername,
+      name: cleanUsername,
+      email: cleanEmail,
+      phone: cleanPhone,
+      password: password,
+    );
+
+    _registeredUsers.add(newUser);
+    userName = newUser.name;
+    userEmail = newUser.email;
+    userPhone = newUser.phone;
+    this.password = newUser.password;
+    _orderOwnerKey = newUser.username.trim().toLowerCase();
+    isLoggedIn = true;
     notifyListeners();
+
+    SheetsService.instance.registerUser(
+      name: newUser.name,
+      email: newUser.email,
+      phone: newUser.phone,
+      password: password,
+    );
+
+    return true;
   }
 
   void addAddress(String address) {
     savedAddresses.add(address);
+    notifyListeners();
+  }
+
+  void updateAddress(int index, String address) {
+    if (index < 0 || index >= savedAddresses.length) return;
+    final clean = address.trim();
+    if (clean.isEmpty) return;
+    savedAddresses[index] = clean;
+    notifyListeners();
+  }
+
+  void removeAddress(int index) {
+    if (index < 0 || index >= savedAddresses.length) return;
+    savedAddresses.removeAt(index);
+    if (selectedAddressIndex > index) {
+      selectedAddressIndex--;
+    } else if (selectedAddressIndex >= savedAddresses.length) {
+      selectedAddressIndex = savedAddresses.isEmpty
+          ? 0
+          : savedAddresses.length - 1;
+    }
     notifyListeners();
   }
 

@@ -20,6 +20,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool _isPasswordVisible = false;
   bool _showFieldErrors = false;
+  bool _isSubmitting = false;
+  String? _loginErrorMessage;
 
   @override
   void dispose() {
@@ -28,16 +30,49 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _handleLogin() {
+  Future<void> _handleLogin() async {
+    if (_isSubmitting) return;
+
     final input = _usernameController.text.trim();
     final password = _passwordController.text.trim();
 
     if (input.isEmpty || password.isEmpty) {
-      setState(() => _showFieldErrors = true);
+      setState(() {
+        _showFieldErrors = true;
+        _loginErrorMessage = null;
+      });
       return;
     }
 
-    _cateringService.login(usernameOrEmail: input);
+    setState(() {
+      _isSubmitting = true;
+      _loginErrorMessage = null;
+    });
+
+    final success = await _cateringService.login(
+      usernameOrEmail: input,
+      password: password,
+    );
+
+    if (!mounted) return;
+
+    if (!success) {
+      setState(() {
+        _isSubmitting = false;
+        _loginErrorMessage =
+            'Akun belum terdaftar atau password salah. Silakan buat akun terlebih dahulu.';
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Akun belum terdaftar. Silakan buat akun terlebih dahulu.',
+          ),
+          backgroundColor: AppColors.tomatoBurst,
+          duration: Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
 
     Navigator.of(context).pushAndRemoveUntil(
       PageRouteBuilder(
@@ -52,10 +87,27 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  void _handleSocialLogin(String provider) {
-    _cateringService.login(
-      usernameOrEmail: provider == 'Google' ? 'User Google' : 'User Facebook',
+  Future<void> _handleSocialLogin(String provider) async {
+    final name = provider == 'Google' ? 'User Google' : 'User Facebook';
+    final email = provider == 'Google'
+        ? 'user.google@gmail.com'
+        : 'user.fb@facebook.com';
+
+    final loggedIn = await _cateringService.login(
+      usernameOrEmail: name,
+      password: 'SocialLogin123!',
     );
+
+    if (!loggedIn) {
+      _cateringService.register(
+        email: email,
+        username: name,
+        phone: '081234567890',
+        password: 'SocialLogin123!',
+      );
+    }
+
+    if (!mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -203,7 +255,6 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: brandOrange,
       body: Column(
         children: [
-          // Header Oranye
           SafeArea(
             bottom: false,
             child: Padding(
@@ -211,7 +262,6 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Baris Atas: Tombol Back (←) dan Teks 'Daftar'
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -276,8 +326,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ],
                   ),
                   const SizedBox(height: 24),
-
-                  // Judul 'Masuk'
                   const Text(
                     'Masuk',
                     style: TextStyle(
@@ -290,7 +338,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 8),
 
-                  // Subtitle
                   Text(
                     'Silahkan Masuk akun apabila sudah mempunyai akun',
                     style: TextStyle(
@@ -307,7 +354,6 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
-          // Konten Form Putih
           Expanded(
             child: Container(
               width: double.infinity,
@@ -321,7 +367,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Field Username / Email
                     PillTextField(
                       controller: _usernameController,
                       hintText: 'Username/Email',
@@ -334,7 +379,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 14),
 
-                    // Field Password
                     PillTextField(
                       controller: _passwordController,
                       hintText: 'Password',
@@ -361,7 +405,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           : null,
                     ),
 
-                    // Link Lupa Password?
                     const SizedBox(height: 10),
                     Align(
                       alignment: Alignment.centerRight,
@@ -386,15 +429,56 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     const SizedBox(height: 24),
 
+                    if (_loginErrorMessage != null) ...[
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.tomatoBurst.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: AppColors.tomatoBurst.withValues(
+                              alpha: 0.35,
+                            ),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.error_outline_rounded,
+                              color: AppColors.tomatoBurst,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                _loginErrorMessage!,
+                                style: const TextStyle(
+                                  fontFamily: 'Plus Jakarta Sans',
+                                  fontSize: 12.5,
+                                  color: AppColors.tomatoBurst,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+
                     SizedBox(
                       width: double.infinity,
                       height: 52,
                       child: ElevatedButton(
                         key: const ValueKey('submit_login_button'),
-                        onPressed: _handleLogin,
+                        onPressed: _isSubmitting ? null : _handleLogin,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFFFFB100),
                           foregroundColor: Colors.black,
+                          disabledBackgroundColor: const Color(0xFFFFB100),
                           elevation: 3,
                           shadowColor: const Color(
                             0xFFFFB100,
@@ -403,20 +487,28 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderRadius: BorderRadius.circular(26),
                           ),
                         ),
-                        child: const Text(
-                          'Masuk',
-                          style: TextStyle(
-                            fontFamily: 'Plus Jakarta Sans',
-                            fontSize: 16,
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
+                        child: _isSubmitting
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                  color: Colors.black,
+                                ),
+                              )
+                            : const Text(
+                                'Masuk',
+                                style: TextStyle(
+                                  fontFamily: 'Plus Jakarta Sans',
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
                       ),
                     ),
 
                     const SizedBox(height: 24),
 
-                    // Garis Pembatas 'Atau'
                     Row(
                       children: [
                         Expanded(
@@ -447,8 +539,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
 
                     const SizedBox(height: 22),
-
-                    // Tombol Continue With Google
                     SizedBox(
                       width: double.infinity,
                       height: 52,
@@ -504,8 +594,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
 
                     const SizedBox(height: 14),
-
-                    // Tombol Continue With Facebook
                     SizedBox(
                       width: double.infinity,
                       height: 52,

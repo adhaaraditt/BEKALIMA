@@ -17,8 +17,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   late TextEditingController _nameController;
   late TextEditingController _phoneController;
   late TextEditingController _addressController;
-  late TextEditingController _dateController;
-  late TextEditingController _timeController;
   final TextEditingController _notesController = TextEditingController();
 
   static const _monthNames = [
@@ -50,8 +48,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     _nameController = TextEditingController(text: _cateringService.userName);
     _phoneController = TextEditingController(text: _cateringService.userPhone);
     _addressController = TextEditingController(text: _cateringService.currentAddress);
-    _dateController = TextEditingController();
-    _timeController = TextEditingController(text: '11:00 WIB');
   }
 
   @override
@@ -59,35 +55,26 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     _nameController.dispose();
     _phoneController.dispose();
     _addressController.dispose();
-    _dateController.dispose();
-    _timeController.dispose();
     _notesController.dispose();
     super.dispose();
-  }
-
-  Future<void> _pickDate() async {
-    final now = DateTime.now();
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: now.add(const Duration(days: 1)),
-      firstDate: now,
-      lastDate: now.add(const Duration(days: 365)),
-      helpText: 'Pilih Tanggal Kirim',
-    );
-    if (picked == null) return;
-    _dateController.text =
-        '${picked.day} ${_monthNames[picked.month - 1]} ${picked.year}';
   }
 
   void _submitOrder() {
     if (!_formKey.currentState!.validate()) return;
 
+    final now = DateTime.now();
+    final eta = now.add(const Duration(hours: 1));
+    final etaStr =
+        '${eta.hour.toString().padLeft(2, '0')}:${eta.minute.toString().padLeft(2, '0')} WIB';
+    final todayStr =
+        'Hari ini, ${now.day} ${_monthNames[now.month - 1]} ${now.year}';
+
     final newOrder = _cateringService.createOrder(
       recipientName: _nameController.text.trim(),
       recipientPhone: _phoneController.text.trim(),
       deliveryAddress: _addressController.text.trim(),
-      eventDate: _dateController.text.trim(),
-      eventTime: _timeController.text.trim(),
+      eventDate: todayStr,
+      eventTime: '1 Jam (estimasi tiba ~$etaStr)',
       paymentMethod: _selectedPayment,
       notes: _notesController.text.trim().isNotEmpty ? _notesController.text.trim() : null,
     );
@@ -141,9 +128,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         actions: [
           ElevatedButton(
             onPressed: () {
-              Navigator.pop(ctx); // Close dialog
-              Navigator.pop(context); // Close checkout
-              Navigator.pop(context); // Close cart, back to home or orders
+              Navigator.pop(ctx);
+              Navigator.pop(context); 
+              Navigator.pop(context); 
             },
             child: const Text('Lihat Pesanan Saya'),
           ),
@@ -166,29 +153,39 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 120),
           children: [
-            // Peringatan Waktu Pemesanan (Lead Time)
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHigh,
+                color: AppColors.crispCarrot.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: theme.colorScheme.outlineVariant),
+                border: Border.all(
+                  color: AppColors.crispCarrot.withValues(alpha: 0.25),
+                ),
               ),
               child: Row(
                 children: [
-                  Icon(
-                    Icons.info_outline,
-                    color: theme.colorScheme.secondary,
-                    size: 22,
+                  const Icon(
+                    Icons.bolt_rounded,
+                    color: AppColors.crispCarrot,
+                    size: 24,
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: Text(
-                      'Pemesanan katering disarankan H-1 sebelum jam 17:00 WIB agar bahan segar dapat disiapkan maksimal.',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: theme.colorScheme.onSurface,
-                      ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Pengiriman Instan (Hari Ini)',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'Pesanan dikirim hari ini juga dengan estimasi tiba dalam 1 jam.',
+                          style: theme.textTheme.bodySmall,
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -196,8 +193,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             ),
             const SizedBox(height: 20),
 
-            // Kontak Penerima
-            Text('Penerima & Kontak Acara', style: theme.textTheme.titleMedium),
+            Text('Penerima & Kontak', style: theme.textTheme.titleMedium),
             const SizedBox(height: 8),
             TextFormField(
               controller: _nameController,
@@ -213,41 +209,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             ),
             const SizedBox(height: 20),
 
-            // Waktu Pengiriman Acara
-            Text('Jadwal Acara & Pengiriman', style: theme.textTheme.titleMedium),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Expanded(
-                  child: TextFormField(
-                    controller: _dateController,
-                    readOnly: true,
-                    onTap: _pickDate,
-                    decoration: const InputDecoration(
-                      labelText: 'Tanggal Kirim',
-                      hintText: 'Pilih tanggal',
-                      prefixIcon: Icon(Icons.calendar_today, size: 18),
-                    ),
-                    validator: (v) => v == null || v.isEmpty ? 'Wajib diisi' : null,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: TextFormField(
-                    controller: _timeController,
-                    decoration: const InputDecoration(
-                      labelText: 'Jam Tiba',
-                      prefixIcon: Icon(Icons.access_time, size: 18),
-                    ),
-                    validator: (v) => v == null || v.isEmpty ? 'Wajib diisi' : null,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-
-            // Alamat Pengiriman
-            Text('Alamat Lokasi Acara', style: theme.textTheme.titleMedium),
+            Text('Alamat Pengantaran', style: theme.textTheme.titleMedium),
             const SizedBox(height: 8),
             TextFormField(
               controller: _addressController,
@@ -266,7 +228,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             ),
             const SizedBox(height: 20),
 
-            // Metode Pembayaran
             Text('Pilihan Pembayaran', style: theme.textTheme.titleMedium),
             const SizedBox(height: 8),
             Card(

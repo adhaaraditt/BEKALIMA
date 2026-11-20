@@ -125,8 +125,6 @@ class _CartScreenState extends State<CartScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 16),
-
-                      // Ringkasan Pembayaran
                       Text(
                         'Rincian Pembayaran',
                         style: theme.textTheme.titleMedium,

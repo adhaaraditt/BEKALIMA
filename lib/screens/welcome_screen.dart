@@ -135,7 +135,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    const brandOrange = Color(0xFFFA5805); // Warna oranye cerah khas BEKALIMA
+    const brandOrange = Color(0xFFFA5805); 
     final screenWidth = MediaQuery.of(context).size.width;
     final logoCacheSize = (163 * MediaQuery.devicePixelRatioOf(context))
         .round();
@@ -144,7 +144,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       backgroundColor: brandOrange,
       body: GestureDetector(
         onVerticalDragEnd: (details) {
-          // Swipe ke atas untuk membuka sheet
           if (details.primaryVelocity != null &&
               details.primaryVelocity! < -200) {
             _openWelcomeSheet();
@@ -155,7 +154,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         },
         child: Stack(
           children: [
-            // Konten Utama: Logo Bento & Teks BEKALIMA
             SafeArea(
               child: SizedBox(
                 width: double.infinity,
@@ -168,7 +166,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Logo Bento dengan animasi floating & breathing halus
                         RepaintBoundary(
                           child: AnimatedBuilder(
                             animation: _logoFloatController,
@@ -187,7 +184,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                               decoration: BoxDecoration(
                                 color: const Color(
                                   0xFFF9EED9,
-                                ), // Warna cream beige lingkaran
+                                ),
                                 shape: BoxShape.circle,
                                 boxShadow: [
                                   BoxShadow(
@@ -221,8 +218,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         ),
 
                         const SizedBox(height: 22),
-
-                        // Judul BEKALIMA
                         const Text(
                           'BEKALIMA',
                           textAlign: TextAlign.center,
@@ -237,8 +232,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         ),
 
                         const SizedBox(height: 6),
-
-                        // Subtitle Healty Food Catering
                         Text(
                           'Healty Food Catering',
                           textAlign: TextAlign.center,
@@ -257,7 +250,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
               ),
             ),
 
-            // Tombol panah di bagian bawah layar
             SafeArea(
               child: Align(
                 alignment: Alignment.bottomCenter,
@@ -309,7 +301,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           child: Stack(
             alignment: Alignment.center,
             children: [
-              // Efek lingkaran pulsing ring di sekeliling tombol
               IgnorePointer(
                 child: Transform.scale(
                   scale: _pulseRingAnimation.value,
@@ -330,7 +321,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                 child: Material(
                   color: const Color(
                     0xFFFFB100,
-                  ), // Warna kuning emas terang sesuai gambar
+                  ), 
                   shape: const CircleBorder(),
                   elevation: 4,
                   shadowColor: Colors.black.withValues(alpha: 0.25),
@@ -385,7 +376,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
             ),
           ),
 
-          // Judul Selamat Datang
           const Text(
             'Selamat Datang',
             style: TextStyle(
@@ -412,7 +402,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           const SizedBox(height: 24),
           Row(
             children: [
-              // Tombol Masuk (Kuning/Oranye terang)
               Expanded(
                 child: SizedBox(
                   height: 50,
@@ -430,7 +419,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         borderRadius: BorderRadius.circular(26),
                       ),
                     ),
-                    // Tombol Masuk
                     child: const Text(
                       'Masuk',
                       style: TextStyle(
@@ -445,7 +433,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
               const SizedBox(width: 14),
 
-              // Tombol Daftar (Hitam)
               Expanded(
                 child: SizedBox(
                   height: 50,
@@ -461,7 +448,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                         borderRadius: BorderRadius.circular(26),
                       ),
                     ),
-                    // Tombol Daftar
                     child: const Text(
                       'Daftar',
                       style: TextStyle(

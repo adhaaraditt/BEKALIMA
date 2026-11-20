@@ -62,7 +62,6 @@ class _MenuCatalogScreenState extends State<MenuCatalogScreen> {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            // Bar Pencarian
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
               child: TextField(
@@ -87,8 +86,6 @@ class _MenuCatalogScreenState extends State<MenuCatalogScreen> {
                 ),
               ),
             ),
-
-            // Filter Kategori (Horizontal Chips)
             SizedBox(
               height: 44,
               child: ListView.separated(
@@ -132,7 +129,6 @@ class _MenuCatalogScreenState extends State<MenuCatalogScreen> {
             ),
             const SizedBox(height: 12),
 
-            // Daftar Menu Katering
             Expanded(
               child: menus.isEmpty
                   ? Center(

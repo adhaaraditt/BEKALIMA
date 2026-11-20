@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'app_colors.dart';
 
-/// milik [MaterialApp]. 
+///  [MaterialApp].
 
 @immutable
 class GlassPalette extends ThemeExtension<GlassPalette> {

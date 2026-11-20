@@ -72,7 +72,7 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
         children: [
-          // Banner visual katering
+
           Container(
             height: 180,
             decoration: BoxDecoration(
@@ -133,8 +133,6 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
             ),
           ),
           const SizedBox(height: 18),
-
-          // Nama menu & Harga
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -165,8 +163,6 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
             ],
           ),
           const SizedBox(height: 10),
-
-          // Rating & Minimal Order
           Row(
             children: [
               Container(
@@ -212,15 +208,11 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
             ],
           ),
           const SizedBox(height: 16),
-
-          // Deskripsi
           Text(
             widget.menu.description,
             style: theme.textTheme.bodyLarge,
           ),
           const SizedBox(height: 24),
-
-          // Komposisi Paket / Isi Lauk Pauk
           Text(
             'Komposisi Paket Katering',
             style: theme.textTheme.titleMedium,
@@ -251,8 +243,6 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
             ),
           ),
           const SizedBox(height: 24),
-
-          // Catatan khusus
           Text(
             'Catatan Khusus untuk Dapur',
             style: theme.textTheme.titleMedium,
@@ -266,8 +256,6 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
             ),
           ),
           const SizedBox(height: 28),
-
-          // Ulasan Pelanggan
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -348,7 +336,6 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
         child: SafeArea(
           child: Row(
             children: [
-              // Pengatur jumlah (+/-)
               Container(
                 decoration: BoxDecoration(
                   color: theme.colorScheme.surfaceContainerHigh,
@@ -375,8 +362,6 @@ class _MenuDetailScreenState extends State<MenuDetailScreen> {
                 ),
               ),
               const SizedBox(width: 14),
-
-              // Tombol Tambah ke Keranjang
               Expanded(
                 child: ElevatedButton(
                   onPressed: _submitAddToCart,

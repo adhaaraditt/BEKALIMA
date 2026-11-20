@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../screens/cart_screen.dart';
 import '../theme/app_colors.dart';
 
-/// Dialog pop-up di tengah layar saat item katering berhasil ditambahkan ke keranjang
 class AddToCartSuccessDialog extends StatelessWidget {
   final String menuName;
   final int quantity;

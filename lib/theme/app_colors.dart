@@ -16,12 +16,12 @@ abstract final class AppColors {
   static const Color border = Color(0xFFE7DEC8);
   static const Color inputFill = Color(0xFFF3EEDF);
 
-  // Palet teal untuk hero & dashboard beranda.
+
   static const Color deepTeal = Color(0xFF02323D);
   static const Color teal = Color(0xFF0B5B67);
   static const Color tealBright = Color(0xFF2FBCB3);
 
-  // Palet mode gelap (hangat, bukan hitam pekat) agar nuansa kuliner tetap terjaga.
+
   static const Color darkBackground = Color(0xFF14110D);
   static const Color darkSurface = Color(0xFF1F1A14);
   static const Color darkSurfaceHigh = Color(0xFF2A241D);

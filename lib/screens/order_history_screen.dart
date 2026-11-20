@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import '../models/order_item.dart';
 import '../services/catering_service.dart';
@@ -17,16 +19,23 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen>
     with SingleTickerProviderStateMixin {
   final CateringService _cateringService = CateringService();
   late TabController _tabController;
+  Timer? _syncTimer;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     _cateringService.addListener(_onServiceChanged);
+    _cateringService.syncOrderStatuses();
+    _syncTimer = Timer.periodic(
+      const Duration(seconds: 10),
+      (_) => _cateringService.syncOrderStatuses(),
+    );
   }
 
   @override
   void dispose() {
+    _syncTimer?.cancel();
     _cateringService.removeListener(_onServiceChanged);
     _tabController.dispose();
     super.dispose();
@@ -39,7 +48,6 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen>
   List<OrderItem> _filterOrders(int tabIndex) {
     final all = _cateringService.orders;
     if (tabIndex == 1) {
-      // Aktif
       return all
           .where(
             (o) =>
@@ -49,7 +57,6 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen>
           )
           .toList();
     } else if (tabIndex == 2) {
-      // Selesai / Dibatalkan
       return all
           .where(
             (o) =>
@@ -136,7 +143,10 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen>
                     itemCount: list.length,
                     itemBuilder: (ctx, i) {
                       final order = list[i];
-                      final statusColor = orderStatusColor(context, order.status);
+                      final statusColor = orderStatusColor(
+                        context,
+                        order.status,
+                      );
 
                       return Card(
                         margin: const EdgeInsets.only(bottom: 14),
@@ -155,7 +165,6 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen>
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // Header Baris: ID & Status
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -188,14 +197,13 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen>
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  'Jadwal Acara: ${order.eventDate} (${order.eventTime})',
+                                  'Pengiriman: ${order.eventDate} (${order.eventTime})',
                                   style: theme.textTheme.bodySmall,
                                 ),
                                 const SizedBox(height: 10),
                                 const Divider(),
                                 const SizedBox(height: 10),
 
-                                // Item menu pertama & ringkasan
                                 Row(
                                   children: [
                                     Container(
@@ -210,22 +218,45 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen>
                                       ),
                                       clipBehavior: Clip.antiAlias,
                                       alignment: Alignment.center,
-                                      child: order.items.isNotEmpty && order.items.first.menu.imageAsset != null
+                                      child:
+                                          order.items.isNotEmpty &&
+                                              order
+                                                      .items
+                                                      .first
+                                                      .menu
+                                                      .imageAsset !=
+                                                  null
                                           ? Image.asset(
-                                              order.items.first.menu.imageAsset!,
+                                              order
+                                                  .items
+                                                  .first
+                                                  .menu
+                                                  .imageAsset!,
                                               width: 44,
                                               height: 44,
                                               fit: BoxFit.cover,
                                               errorBuilder: (_, _, _) => Text(
-                                                order.items.first.menu.imageEmoji,
-                                                style: const TextStyle(fontSize: 22),
+                                                order
+                                                    .items
+                                                    .first
+                                                    .menu
+                                                    .imageEmoji,
+                                                style: const TextStyle(
+                                                  fontSize: 22,
+                                                ),
                                               ),
                                             )
                                           : Text(
                                               order.items.isNotEmpty
-                                                  ? order.items.first.menu.imageEmoji
+                                                  ? order
+                                                        .items
+                                                        .first
+                                                        .menu
+                                                        .imageEmoji
                                                   : '🍱',
-                                              style: const TextStyle(fontSize: 22),
+                                              style: const TextStyle(
+                                                fontSize: 22,
+                                              ),
                                             ),
                                     ),
                                     const SizedBox(width: 12),
@@ -272,7 +303,6 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen>
                                 ),
                                 const SizedBox(height: 12),
 
-                                // Tombol Cepat Bawah
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [

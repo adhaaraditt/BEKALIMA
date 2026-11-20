@@ -58,7 +58,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    _cateringService.register(email: email, username: username, phone: phone);
+    final ok = _cateringService.register(
+      email: email,
+      username: username,
+      phone: phone,
+      password: password,
+    );
+
+    if (!ok) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Username atau Email sudah terdaftar. Silakan masuk.'),
+          backgroundColor: AppColors.tomatoBurst,
+          duration: Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -82,7 +98,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   void _handleGoogleRegister() {
-    _cateringService.login(usernameOrEmail: 'User Google');
+    _cateringService.register(
+      email: 'user.google@gmail.com',
+      username: 'User Google',
+      phone: '081234567890',
+      password: 'GoogleUser123!',
+    );
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -112,7 +133,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       backgroundColor: brandOrange,
       body: Column(
         children: [
-          // Header Oranye
           SafeArea(
             bottom: false,
             child: Padding(
@@ -120,7 +140,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Baris Atas: Tombol Back (←) dan Teks 'Masuk'
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -186,7 +205,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   const SizedBox(height: 24),
 
-                  // Judul 'Daftar'
+
                   const Text(
                     'Daftar',
                     style: TextStyle(
@@ -199,7 +218,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   const SizedBox(height: 8),
 
-                  // Subtitle
                   Text(
                     'Silahkan membuat akun terlebih dahulu',
                     style: TextStyle(
@@ -216,7 +234,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ),
 
-          // Konten Form Putih
           Expanded(
             child: Container(
               width: double.infinity,
@@ -230,7 +247,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // 1. Email
                     PillTextField(
                       controller: _emailController,
                       hintText: 'Email',
@@ -241,8 +257,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                     const SizedBox(height: 14),
-
-                    // 2. Username
                     PillTextField(
                       controller: _usernameController,
                       hintText: 'Username',
@@ -252,8 +266,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                     const SizedBox(height: 14),
-
-                    // 3. No Telepon
                     PillTextField(
                       controller: _phoneController,
                       hintText: 'No Telepon',
@@ -264,8 +276,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                     const SizedBox(height: 14),
-
-                    // 4. Password
                     PillTextField(
                       controller: _passwordController,
                       hintText: 'Password',
@@ -290,8 +300,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           'Harus ada huruf besar, angka, simbol, dan minimal 8 karakter.',
                     ),
                     const SizedBox(height: 14),
-
-                    // 5. Ulangi Password
                     PillTextField(
                       controller: _confirmPasswordController,
                       hintText: 'Ulangi Password',
@@ -317,8 +325,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                     const SizedBox(height: 28),
-
-                    // Tombol 'Daftar' (Kuning/Oranye terang)
                     SizedBox(
                       width: double.infinity,
                       height: 52,
@@ -348,8 +354,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
 
                     const SizedBox(height: 24),
-
-                    // Garis Pembatas 'Atau'
                     Row(
                       children: [
                         Expanded(
@@ -380,8 +384,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
 
                     const SizedBox(height: 22),
-
-                    // Tombol Continue With Google
                     SizedBox(
                       width: double.infinity,
                       height: 52,

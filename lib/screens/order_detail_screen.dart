@@ -17,11 +17,30 @@ class OrderDetailScreen extends StatefulWidget {
 class _OrderDetailScreenState extends State<OrderDetailScreen> {
   final CateringService _cateringService = CateringService();
 
+  @override
+  void initState() {
+    super.initState();
+    _cateringService.addListener(_onServiceChanged);
+    _cateringService.syncOrderStatuses();
+  }
+
+  @override
+  void dispose() {
+    _cateringService.removeListener(_onServiceChanged);
+    super.dispose();
+  }
+
+  void _onServiceChanged() {
+    if (mounted) setState(() {});
+  }
+
   Future<void> _showReviewDialog() async {
     final result = await ReviewDialog.show(context);
     if (result == null || !mounted) return;
 
-    final firstMenuId = widget.order.items.isNotEmpty ? widget.order.items.first.menu.id : 'm1';
+    final firstMenuId = widget.order.items.isNotEmpty
+        ? widget.order.items.first.menu.id
+        : 'm1';
     _cateringService.addReview(
       orderId: widget.order.id,
       menuId: firstMenuId,
@@ -41,14 +60,71 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     _cateringService.confirmPayment(widget.order.id);
     setState(() {});
 
-    final wantsReview = await showDialog<bool>(
+    await showDialog<void>(
       context: context,
-      barrierDismissible: false,
-      builder: (_) => _PaymentSuccessDialog(orderId: widget.order.id),
+      builder: (context) => AlertDialog(
+        title: const Text('Pembayaran Diterima'),
+        content: const Text(
+          'Status pesanan sekarang Terbayar. Ulasan bisa diberikan setelah pesanan selesai.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Oke'),
+          ),
+        ],
+      ),
     );
-    if (wantsReview == true && mounted) {
-      await _showReviewDialog();
+  }
+
+  void _changeQuantity(int currentQuantity, String menuId, int delta) {
+    final next = currentQuantity + delta;
+    if (next <= 0 && widget.order.items.length == 1) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Minimal 1 menu dalam pesanan.')),
+      );
+      return;
     }
+    _cateringService.updateOrderItemQuantity(widget.order.id, menuId, next);
+  }
+
+  Future<void> _showAddMenuSheet() async {
+    final existingIds = widget.order.items.map((item) => item.menu.id).toSet();
+    final menus = _cateringService.menus
+        .where((menu) => !existingIds.contains(menu.id))
+        .toList();
+    if (menus.isEmpty) return;
+
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (ctx) => SafeArea(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.sizeOf(ctx).height * 0.6,
+          ),
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: menus.length,
+            itemBuilder: (_, index) {
+              final menu = menus[index];
+              return ListTile(
+                title: Text(menu.name),
+                subtitle: Text(formatRupiah(menu.price)),
+                trailing: Icon(
+                  Icons.add_circle,
+                  color: Theme.of(ctx).colorScheme.secondary,
+                ),
+                onTap: () {
+                  _cateringService.addOrderItem(widget.order.id, menu);
+                  Navigator.pop(ctx);
+                },
+              );
+            },
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -57,13 +133,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     final statusColor = orderStatusColor(context, widget.order.status);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Rincian ${widget.order.id}'),
-      ),
+      appBar: AppBar(title: Text('Rincian ${widget.order.id}')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // Banner Status
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -75,11 +148,11 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               children: [
                 Icon(
                   widget.order.status == OrderStatus.completed ||
-                  widget.order.status == OrderStatus.paid
+                          widget.order.status == OrderStatus.paid
                       ? Icons.check_circle
                       : widget.order.status == OrderStatus.cancelled
-                          ? Icons.cancel
-                          : Icons.access_time_filled,
+                      ? Icons.cancel
+                      : Icons.access_time_filled,
                   color: statusColor,
                   size: 28,
                 ),
@@ -97,7 +170,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'Jadwal Kirim: ${widget.order.eventDate} pukul ${widget.order.eventTime}',
+                        'Pengiriman: ${widget.order.eventDate} • ${widget.order.eventTime}',
                         style: theme.textTheme.bodySmall,
                       ),
                     ],
@@ -108,13 +181,14 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           ),
           const SizedBox(height: 20),
 
-          // Tombol Aksi Cepat berdasarkan status
           if (widget.order.canBeCancelled) ...[
             Row(
               children: [
                 Expanded(
                   child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(backgroundColor: AppColors.forestGreen),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.forestGreen,
+                    ),
                     onPressed: _simulatePaymentSuccess,
                     child: const Text('Simulasi Bayar Berhasil'),
                   ),
@@ -130,7 +204,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       _cateringService.cancelOrder(widget.order.id);
                       setState(() {});
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Pesanan telah dibatalkan.')),
+                        const SnackBar(
+                          content: Text('Pesanan telah dibatalkan.'),
+                        ),
                       );
                     },
                     child: const Text('Batalkan Pesanan'),
@@ -163,7 +239,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       ),
                       child: const Text(
                         'Sudah Diulas ⭐',
-                        style: TextStyle(fontWeight: FontWeight.w700, color: AppColors.forestGreen),
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.forestGreen,
+                        ),
                       ),
                     ),
                   ),
@@ -177,7 +256,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           backgroundColor: AppColors.forestGreen,
-                          content: Text('Menu ditambahkan kembali ke keranjang!'),
+                          content: Text(
+                            'Menu ditambahkan kembali ke keranjang!',
+                          ),
                         ),
                       );
                       Navigator.pop(context);
@@ -189,7 +270,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             const SizedBox(height: 20),
           ],
 
-          // Informasi Pengantaran
           Text('Informasi Pengantaran', style: theme.textTheme.titleMedium),
           const SizedBox(height: 8),
           Card(
@@ -200,27 +280,48 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.person_outline, size: 20, color: theme.colorScheme.onSurfaceVariant),
+                      Icon(
+                        Icons.person_outline,
+                        size: 20,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
                       const SizedBox(width: 8),
-                      Text(widget.order.recipientName, style: theme.textTheme.titleSmall),
+                      Text(
+                        widget.order.recipientName,
+                        style: theme.textTheme.titleSmall,
+                      ),
                     ],
                   ),
                   const SizedBox(height: 6),
                   Row(
                     children: [
-                      Icon(Icons.phone_outlined, size: 20, color: theme.colorScheme.onSurfaceVariant),
+                      Icon(
+                        Icons.phone_outlined,
+                        size: 20,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
                       const SizedBox(width: 8),
-                      Text(widget.order.recipientPhone, style: theme.textTheme.bodyMedium),
+                      Text(
+                        widget.order.recipientPhone,
+                        style: theme.textTheme.bodyMedium,
+                      ),
                     ],
                   ),
                   const SizedBox(height: 6),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.location_on_outlined, size: 20, color: theme.colorScheme.onSurfaceVariant),
+                      Icon(
+                        Icons.location_on_outlined,
+                        size: 20,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
                       const SizedBox(width: 8),
                       Expanded(
-                        child: Text(widget.order.deliveryAddress, style: theme.textTheme.bodyMedium),
+                        child: Text(
+                          widget.order.deliveryAddress,
+                          style: theme.textTheme.bodyMedium,
+                        ),
                       ),
                     ],
                   ),
@@ -228,7 +329,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                     const SizedBox(height: 8),
                     Text(
                       'Catatan: "${widget.order.notes}"',
-                      style: theme.textTheme.bodySmall?.copyWith(fontStyle: FontStyle.italic),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        fontStyle: FontStyle.italic,
+                      ),
                     ),
                   ],
                 ],
@@ -237,8 +340,22 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           ),
           const SizedBox(height: 20),
 
-          // Daftar Item Menu
-          Text('Daftar Menu Katering', style: theme.textTheme.titleMedium),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Daftar Menu Katering',
+                  style: theme.textTheme.titleMedium,
+                ),
+              ),
+              if (widget.order.canBeEdited)
+                TextButton.icon(
+                  onPressed: _showAddMenuSheet,
+                  icon: const Icon(Icons.add, size: 18),
+                  label: const Text('Tambah Menu'),
+                ),
+            ],
+          ),
           const SizedBox(height: 8),
           Card(
             child: Column(
@@ -252,23 +369,68 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                             width: 36,
                             height: 36,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, _, _) => Text(item.menu.imageEmoji, style: const TextStyle(fontSize: 24)),
+                            errorBuilder: (_, _, _) => Text(
+                              item.menu.imageEmoji,
+                              style: const TextStyle(fontSize: 24),
+                            ),
                           ),
                         )
-                      : Text(item.menu.imageEmoji, style: const TextStyle(fontSize: 24)),
-                  title: Text(item.menu.name, style: theme.textTheme.titleSmall),
-                  subtitle: Text('${item.quantity} porsi x ${formatRupiah(item.menu.price)}'),
-                  trailing: Text(
-                    formatRupiah(item.subtotal),
-                    style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+                      : Text(
+                          item.menu.imageEmoji,
+                          style: const TextStyle(fontSize: 24),
+                        ),
+                  title: Text(
+                    item.menu.name,
+                    style: theme.textTheme.titleSmall,
                   ),
+                  subtitle: Text(
+                    '${formatRupiah(item.menu.price)} / porsi • ${formatRupiah(item.subtotal)}',
+                  ),
+                  trailing: widget.order.canBeEdited
+                      ? Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              visualDensity: VisualDensity.compact,
+                              icon: const Icon(
+                                Icons.remove_circle_outline,
+                                size: 20,
+                              ),
+                              onPressed: () => _changeQuantity(
+                                item.quantity,
+                                item.menu.id,
+                                -1,
+                              ),
+                            ),
+                            Text(
+                              '${item.quantity}',
+                              style: theme.textTheme.titleSmall,
+                            ),
+                            IconButton(
+                              visualDensity: VisualDensity.compact,
+                              icon: const Icon(
+                                Icons.add_circle_outline,
+                                size: 20,
+                              ),
+                              onPressed: () => _changeQuantity(
+                                item.quantity,
+                                item.menu.id,
+                                1,
+                              ),
+                            ),
+                          ],
+                        )
+                      : Text(
+                          formatRupiah(item.subtotal),
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
                 );
               }).toList(),
             ),
           ),
           const SizedBox(height: 20),
-
-          // Rincian Pembayaran
           Text('Rincian Biaya & Metode', style: theme.textTheme.titleMedium),
           const SizedBox(height: 8),
           Card(
@@ -280,7 +442,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text('Metode Pembayaran'),
-                      Text(widget.order.paymentMethod, style: const TextStyle(fontWeight: FontWeight.w600)),
+                      Text(
+                        widget.order.paymentMethod,
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 8),
@@ -289,7 +454,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Total Keseluruhan', style: theme.textTheme.titleMedium),
+                      Text(
+                        'Total Keseluruhan',
+                        style: theme.textTheme.titleMedium,
+                      ),
                       Text(
                         formatRupiah(widget.order.totalPrice),
                         style: theme.textTheme.titleMedium?.copyWith(
@@ -304,80 +472,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-/// Pop-up terpusat setelah simulasi pembayaran berhasil.
-class _PaymentSuccessDialog extends StatelessWidget {
-  final String orderId;
-
-  const _PaymentSuccessDialog({required this.orderId});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final green = theme.colorScheme.secondary;
-
-    return Dialog(
-      backgroundColor: theme.colorScheme.surface,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 420),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 28, 24, 16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  color: green.withValues(alpha: 0.14),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.check_circle_rounded,
-                  color: green,
-                  size: 38,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Pembayaran Berhasil!',
-                textAlign: TextAlign.center,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Pesanan $orderId sudah selesai. Bagikan ulasan Anda untuk membantu pelanggan lain.',
-                textAlign: TextAlign.center,
-                style: theme.textTheme.bodySmall?.copyWith(height: 1.4),
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                height: 46,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context, true),
-                  child: const Text('Beri Ulasan Sekarang'),
-                ),
-              ),
-              const SizedBox(height: 10),
-              TextButton(
-                style: TextButton.styleFrom(
-                  foregroundColor: theme.colorScheme.onSurfaceVariant,
-                ),
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('Nanti Saja'),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

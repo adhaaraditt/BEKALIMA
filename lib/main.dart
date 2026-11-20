@@ -54,9 +54,6 @@ class _BekalimaAppState extends State<BekalimaApp>
     WidgetsBinding.instance.addPostFrameCallback((_) => frame?.dispose());
   }
 
-  /// Mengambil potret layar lama, lalu tema baru muncul lewat lingkaran yang
-  /// melebar dari tombol. Potret dipakai supaya isi tema lama tidak ikut
-  /// berubah warna sebelum lingkaran menutupinya.
   Future<void> _handleThemeChange() async {
     if (!mounted) return;
 
@@ -80,7 +77,6 @@ class _BekalimaAppState extends State<BekalimaApp>
       return;
     }
 
-    // Pastikan frame terakhir sudah selesai dilukis sebelum dipotret.
     await WidgetsBinding.instance.endOfFrame;
     if (!mounted) return;
 

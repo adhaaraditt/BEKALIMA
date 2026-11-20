@@ -28,7 +28,6 @@ class CateringMenuCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header kartu: Badge kategori / badge khusus & Rating
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -67,12 +66,9 @@ class CateringMenuCard extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 10),
-
-              // Bagian konten menu
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Avatar visual makanan
                   Container(
                     width: 64,
                     height: 64,
@@ -100,7 +96,6 @@ class CateringMenuCard extends StatelessWidget {
                           ),
                   ),
                   const SizedBox(width: 12),
-                  // Nama & deskripsi singkat
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -133,8 +128,6 @@ class CateringMenuCard extends StatelessWidget {
               const SizedBox(height: 12),
               const Divider(),
               const SizedBox(height: 10),
-
-              // Footer kartu: Harga & Tombol Tambah
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
